@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Eros - Domine a Arte da Sedução</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            gold: { 400: '#facc15', 500: '#eab308', 600: '#ca8a04', 700: '#a16207' },
+            dark: { 900: '#0b0b0f', 800: '#12131c', 700: '#1a1c29', 600: '#25283b' },
+            crimson: { 500: '#ef4444', 600: '#dc2626', 700: '#b91c1c' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #0b0b0f; color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+    .gold-gradient { background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%); }
+    .gold-text { background: linear-gradient(135deg, #fde047 0%, #ca8a04 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .glass-card { background: rgba(18, 19, 28, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(250, 204, 21, 0.15); }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #12131c; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #ca8a04; border-radius: 4px; }
+  </style>
+</head>
+<body class="h-screen flex flex-col justify-between overflow-hidden">
+
+  <!-- TOP HEADER -->
+  <header class="glass-card px-4 py-3 flex items-center justify-between border-b border-gold-600/20 z-20">
+    <div class="flex items-center space-x-3">
+      <div class="w-9 h-9 rounded-full gold-gradient flex items-center justify-center text-dark-900 font-bold text-lg shadow-lg shadow-gold-500/20">
+        <i class="fa-solid fa-crown text-sm"></i>
+      </div>
+      <div>
+        <h1 class="font-bold text-base tracking-wide gold-text leading-tight">EROS <span class="text-xs text-gray-400 font-normal">ULTRA-PREMIUM</span></h1>
+        <p class="text-[10px] text-gray-400">Field Intelligence & Live Coach</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center space-x-2">
+      <button onclick="toggleAudioSetting()" id="audioToggleBtn" class="p-2 rounded-lg bg-dark-700 text-gray-400 hover:text-gold-400 border border-gray-800 text-xs flex items-center space-x-1">
+        <i class="fa-solid fa-volume-high text-gold-400" id="audioIcon"></i>
+      </button>
+      <button onclick="openApiModal()" class="p-2 rounded-lg bg-dark-700 text-gold-400 border border-gold-500/30 text-xs flex items-center space-x-1 hover:bg-dark-600">
+        <i class="fa-solid fa-key"></i>
+        <span class="hidden sm:inline">Gemini API</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="flex-1 overflow-y-auto custom-scrollbar relative p-4" id="mainContainer">
+
+    <!-- ABA 1: SIMULADOR DE CHAT -->
+    <section id="tab-simulator" class="space-y-4 max-w-4xl mx-auto">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-200 flex items-center gap-2">
+          <i class="fa-solid fa-comments text-gold-500"></i> Simulador Tinder & Match
+        </h2>
+        <span class="text-xs px-2.5 py-1 rounded-full bg-gold-500/10 text-gold-400 border border-gold-500/20" id="aiModeBadge">Modo: Local</span>
+      </div>
+
+      <!-- Filtro de Escalão -->
+      <div class="flex space-x-2 overflow-x-auto pb-1 text-xs">
+        <button onclick="filterPersonas('all')" class="persona-filter-btn px-3 py-1.5 rounded-lg bg-gold-500 text-dark-900 font-bold">Todos</button>
+        <button onclick="filterPersonas('e1')" class="persona-filter-btn px-3 py-1.5 rounded-lg bg-dark-700 text-gray-300 border border-gray-800">Nível 1 (6.0 - 7.5)</button>
+        <button onclick="filterPersonas('e2')" class="persona-filter-btn px-3 py-1.5 rounded-lg bg-dark-700 text-gray-300 border border-gray-800">Nível 2 (8.0 - 8.5)</button>
+        <button onclick="filterPersonas('e3')" class="persona-filter-btn px-3 py-1.5 rounded-lg bg-dark-700 text-gray-300 border border-gray-800">Nível 3 (9.0 - 10.0)</button>
+      </div>
+
+      <!-- Carrossel/Seleção de Personas -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="personaCardsContainer">
+        <!-- Injetado via Javascript -->
+      </div>
+
+      <!-- ÁREA DE CHAT COMPLETA -->
+      <div class="glass-card rounded-2xl flex flex-col h-[520px] overflow-hidden border border-gold-500/20">
+        
+        <!-- Header da Conversa -->
+        <div class="px-4 py-3 bg-dark-800/90 border-b border-gray-800 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="relative">
+              <img id="activePersonaAvatar" src="" class="w-10 h-10 rounded-full object-cover border border-gold-500/40">
+              <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-dark-900 rounded-full"></span>
+            </div>
+            <div>
+              <div class="flex items-center space-x-2">
+                <h3 id="activePersonaName" class="font-bold text-sm text-gray-100">---</h3>
+                <span id="activePersonaRating" class="text-[10px] px-1.5 py-0.5 rounded bg-gold-500/20 text-gold-400 font-bold border border-gold-500/30">10/10</span>
+              </div>
+              <p id="activePersonaArchetype" class="text-xs text-gray-400">Selecione uma persona</p>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <button onclick="openGalleryModal()" class="px-2.5 py-1.5 rounded-lg bg-dark-700 text-xs text-gray-300 hover:text-gold-400 border border-gray-700 flex items-center gap-1">
+              <i class="fa-regular fa-images text-gold-400"></i> Fotos
+            </button>
+            <div class="text-right">
+              <div class="text-[10px] text-gray-400">Atração</div>
+              <div class="w-20 bg-dark-900 rounded-full h-2 overflow-hidden border border-gray-800">
+                <div id="attractionBar" class="bg-gradient-to-r from-red-500 via-gold-500 to-green-500 h-full w-[50%] transition-all duration-500"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mensagens do Chat -->
+        <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-3 custom-scrollbar bg-dark-900/60">
+          <!-- Mensagens Injetadas via JS -->
+        </div>
+
+        <!-- Eros Advisor Banner (Feedback em Tempo Real) -->
+        <div id="advisorBanner" class="hidden px-4 py-2.5 bg-dark-800 border-t border-b border-gold-500/30 flex items-start space-x-3 text-xs">
+          <i class="fa-solid fa-brain text-gold-400 text-base mt-0.5"></i>
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-gold-400">Eros Advisor Feedback</span>
+              <span id="advisorScore" class="font-extrabold text-white">Score: 8.5/10</span>
+            </div>
+            <p id="advisorText" class="text-gray-300 text-[11px] mt-0.5">Sua abordagem interrompeu o padrão. Ótimo enquadramento.</p>
+          </div>
+        </div>
+
+        <!-- Input e Ações do Chat -->
+        <div class="p-3 bg-dark-800 border-t border-gray-800 flex flex-col space-y-2">
+          <div class="flex items-center space-x-2">
+            <button onclick="injectHookScript()" class="px-2.5 py-2 rounded-xl bg-gold-500/10 hover:bg-gold-500/20 text-gold-400 border border-gold-500/30 text-xs font-semibold whitespace-nowrap flex items-center gap-1">
+              <i class="fa-solid fa-bolt"></i> Sequestro
+            </button>
+
+            <div class="relative flex-1">
+              <input type="text" id="chatInput" onkeydown="handleChatKeyPress(event)" placeholder="Escreva sua abordagem..." class="w-full bg-dark-900 border border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-100 focus:outline-none focus:border-gold-500 pr-8">
+              <button onclick="copyCurrentInput()" title="Copiar texto para o Tinder" class="absolute right-2.5 top-2.5 text-gray-400 hover:text-gold-400 text-xs">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
+
+            <button onclick="startVoiceInput()" id="micBtn" title="Falar por voz" class="p-2 rounded-xl bg-dark-700 text-gray-300 hover:text-gold-400 border border-gray-700 text-xs">
+              <i class="fa-solid fa-microphone"></i>
+            </button>
+
+            <button onclick="sendChatMessage()" class="px-4 py-2 rounded-xl gold-gradient text-dark-900 font-bold text-xs hover:opacity-90 flex items-center gap-1">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABA 2: EROS VISION AI (ANALISADOR DE PRINTS) -->
+    <section id="tab-vision" class="hidden space-y-4 max-w-4xl mx-auto">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-200 flex items-center gap-2">
+          <i class="fa-solid fa-eye text-gold-500"></i> Eros Vision - Analisador de Prints Reais
+        </h2>
+        <span class="text-xs px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/30">AI OCR & Diagnosis</span>
+      </div>
+
+      <div class="glass-card rounded-2xl p-5 border border-gold-500/20 space-y-4">
+        <p class="text-xs text-gray-300">Carregue um print da conversa do Tinder, Instagram ou WhatsApp para obter uma análise fria do enquadramento e sugestões de resposta calibradas.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Upload Area -->
+          <div class="border-2 border-dashed border-gray-700 hover:border-gold-500/50 rounded-xl p-6 flex flex-col items-center justify-center text-center bg-dark-900/50 cursor-pointer" onclick="document.getElementById('visionFileInput').click()">
+            <input type="file" id="visionFileInput" accept="image/*" class="hidden" onchange="handleVisionImageUpload(event)">
+            <i class="fa-solid fa-cloud-arrow-up text-3xl text-gold-400 mb-2"></i>
+            <span class="text-xs text-gray-200 font-semibold">Clique para enviar o Print da Conversa</span>
+            <span class="text-[10px] text-gray-400 mt-1">Formatos: PNG, JPG, WEBP</span>
+            <img id="visionPreview" class="hidden mt-3 max-h-40 rounded-lg border border-gold-500/30 object-contain">
+          </div>
+
+          <!-- Context & Controls -->
+          <div class="space-y-3">
+            <div>
+              <label class="text-xs text-gray-400 font-medium">Nível do Match (Nota Percebida)</label>
+              <select id="visionRating" class="w-full mt-1 bg-dark-900 border border-gray-700 rounded-lg p-2 text-xs text-gray-200">
+                <option value="7.0">Nível 1 (6.0 - 7.5) - Receptiva / Direta</option>
+                <option value="8.5" selected>Nível 2 (8.0 - 8.5) - Exigente / Inflacionada</option>
+                <option value="10.0">Nível 3 (9.0 - 10.0) - High-Value / Shit Tests Severos</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="text-xs text-gray-400 font-medium">Texto da Conversa (Opcional se enviar o print)</label>
+              <textarea id="visionTextInput" rows="3" placeholder="Cole as últimas mensagens aqui..." class="w-full mt-1 bg-dark-900 border border-gray-700 rounded-lg p-2 text-xs text-gray-200 focus:outline-none focus:border-gold-500"></textarea>
+            </div>
+
+            <button onclick="analyzeVisionPrint()" class="w-full py-2.5 rounded-xl gold-gradient text-dark-900 font-bold text-xs flex items-center justify-center gap-2">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Analisar Print e Gerar Respostas
+            </button>
+          </div>
+        </div>
+
+        <!-- Vision Result Area -->
+        <div id="visionResult" class="hidden mt-4 pt-4 border-t border-gray-800 space-y-4">
+          <div class="bg-dark-900 p-4 rounded-xl border border-gold-500/30">
+            <h4 class="font-bold text-xs gold-text uppercase tracking-wider mb-1"><i class="fa-solid fa-microscope"></i> Diagnóstico de Frame & Psicologia</h4>
+            <p id="visionDiagnosisText" class="text-xs text-gray-300 leading-relaxed">---</p>
+          </div>
+
+          <div class="space-y-2">
+            <h4 class="font-bold text-xs text-gray-200"><i class="fa-solid fa-reply-all text-gold-400"></i> Sugestões de Respostas Calibradas:</h4>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div class="bg-dark-800 p-3 rounded-xl border border-gray-700">
+                <span class="text-[10px] px-2 py-0.5 rounded bg-gold-500/20 text-gold-400 font-bold">Opção A: Sequestro</span>
+                <p id="optAText" class="text-xs text-gray-200 mt-2">---</p>
+                <button onclick="copyText('optAText')" class="mt-3 w-full py-1 rounded bg-dark-700 text-xs text-gray-300 hover:text-gold-400 border border-gray-600">Copiar</button>
+              </div>
+
+              <div class="bg-dark-800 p-3 rounded-xl border border-gray-700">
+                <span class="text-[10px] px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 font-bold">Opção B: Push-Pull</span>
+                <p id="optBText" class="text-xs text-gray-200 mt-2">---</p>
+                <button onclick="copyText('optBText')" class="mt-3 w-full py-1 rounded bg-dark-700 text-xs text-gray-300 hover:text-gold-400 border border-gray-600">Copiar</button>
+              </div>
+
+              <div class="bg-dark-800 p-3 rounded-xl border border-gray-700">
+                <span class="text-[10px] px-2 py-0.5 rounded bg-green-500/20 text-green-400 font-bold">Opção C: Fechamento</span>
+                <p id="optCText" class="text-xs text-gray-200 mt-2">---</p>
+                <button onclick="copyText('optCText')" class="mt-3 w-full py-1 rounded bg-dark-700 text-xs text-gray-300 hover:text-gold-400 border border-gray-600">Copiar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABA 3: FIELD SIMULATOR (ENCONTRO REAL) -->
+    <section id="tab-field" class="hidden space-y-4 max-w-4xl mx-auto">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-200 flex items-center gap-2">
+          <i class="fa-solid fa-glass-water text-gold-500"></i> Field Simulator - Encontro Real
+        </h2>
+        <span class="text-xs px-2.5 py-1 rounded-full bg-green-500/10 text-green-400 border border-green-500/30">Presencial</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Cenários de Encontro -->
+        <div class="md:col-span-2 glass-card rounded-2xl p-4 border border-gold-500/20 space-y-3">
+          <h3 class="font-bold text-xs gold-text uppercase tracking-wider">Simulação de Decisão Presencial</h3>
+          
+          <div class="flex space-x-2 text-xs">
+            <button onclick="loadFieldScenario('drinks')" class="px-3 py-1.5 rounded-lg bg-gold-500 text-dark-900 font-bold">Bar de Drinks</button>
+            <button onclick="loadFieldScenario('cafe')" class="px-3 py-1.5 rounded-lg bg-dark-700 text-gray-300 border border-gray-800">Café / Passeio</button>
+            <button onclick="loadFieldScenario('dinner')" class="px-3 py-1.5 rounded-lg bg-dark-700 text-gray-300 border border-gray-800">Restaurante</button>
+          </div>
+
+          <div id="fieldScenarioCard" class="bg-dark-900/80 p-4 rounded-xl border border-gray-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <span id="scenarioTitle" class="font-bold text-sm text-gray-100">---</span>
+              <span id="scenarioPersonaBadge" class="text-[10px] px-2 py-0.5 rounded bg-gold-500/20 text-gold-400">Match 9.5/10</span>
+            </div>
+            <p id="scenarioDescription" class="text-xs text-gray-300 leading-relaxed">---</p>
+            
+            <div id="scenarioChoices" class="space-y-2 pt-2">
+              <!-- Injetado via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Kino Ladder & Escalação Física -->
+        <div class="glass-card rounded-2xl p-4 border border-gold-500/20 space-y-3">
+          <h3 class="font-bold text-xs gold-text uppercase tracking-wider"><i class="fa-solid fa-hand-holding-heart"></i> Kino Escalation Ladder</h3>
+          <p class="text-[11px] text-gray-400">Guia tático do toque social ao nível de intimidade física no encontro.</p>
+
+          <div class="space-y-2 text-xs">
+            <div class="p-2.5 rounded-lg bg-dark-900 border border-gray-800">
+              <span class="font-bold text-gold-400">1. Toque Social (0-15min)</span>
+              <p class="text-[11px] text-gray-300 mt-0.5">Abraço de chegada, toque leve no cotovelo ao guiá-la até a mesa.</p>
+            </div>
+
+            <div class="p-2.5 rounded-lg bg-dark-900 border border-gray-800">
+              <span class="font-bold text-gold-400">2. Toque de Conforto (30-60min)</span>
+              <p class="text-[11px] text-gray-300 mt-0.5">Toque no ombro ao rir, proximidade dos joelhos sob a mesa.</p>
+            </div>
+
+            <div class="p-2.5 rounded-lg bg-dark-900 border border-gray-800">
+              <span class="font-bold text-gold-400">3. Toque de Tensão (Pós-Drinks)</span>
+              <p class="text-[11px] text-gray-300 mt-0.5">Mãos dadas ao mudar de local, ajuste de mecha de cabelo.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABA 4: DIÁRIO DE CAMPO & ANALYTICS (NOVO RECURSO #4) -->
+    <section id="tab-reports" class="hidden space-y-4 max-w-4xl mx-auto">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-200 flex items-center gap-2">
+          <i class="fa-solid fa-chart-line text-gold-500"></i> Diário de Campo & Analytics Avançado
+        </h2>
+        <span class="text-xs px-2.5 py-1 rounded-full bg-gold-500/10 text-gold-400 border border-gold-500/30">Field Reports</span>
+      </div>
+
+      <!-- DASHBOARD CARDS -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="glass-card p-3 rounded-xl border border-gold-500/20 text-center">
+          <span class="text-[10px] text-gray-400 uppercase tracking-wider block">Total Encontros</span>
+          <span id="statTotalDates" class="text-xl font-extrabold gold-text mt-1 block">0</span>
+        </div>
+        <div class="glass-card p-3 rounded-xl border border-gold-500/20 text-center">
+          <span class="text-[10px] text-gray-400 uppercase tracking-wider block">Taxa de Conversão</span>
+          <span id="statConversionRate" class="text-xl font-extrabold text-green-400 mt-1 block">0%</span>
+        </div>
+        <div class="glass-card p-3 rounded-xl border border-gold-500/20 text-center">
+          <span class="text-[10px] text-gray-400 uppercase tracking-wider block">Score Médio</span>
+          <span id="statAvgScore" class="text-xl font-extrabold text-gold-400 mt-1 block">0.0</span>
+        </div>
+        <div class="glass-card p-3 rounded-xl border border-gold-500/20 text-center">
+          <span class="text-[10px] text-gray-400 uppercase tracking-wider block">Nível Predominante</span>
+          <span id="statTopLevel" class="text-xl font-extrabold text-purple-400 mt-1 block">--</span>
+        </div>
+      </div>
+
+      <!-- PAINEL PRINCIPAL: FORMULÁRIO DE REGISTRO E GRÁFICOS -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Formulário de Novo Field Report -->
+        <div class="glass-card p-4 rounded-2xl border border-gold-500/20 space-y-3">
+          <h3 class="font-bold text-xs gold-text uppercase tracking-wider"><i class="fa-solid fa-pen-to-square"></i> Registrar Novo Encontro Real</h3>
+
+          <form id="fieldReportForm" onsubmit="saveFieldReport(event)" class="space-y-3">
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-[11px] text-gray-400">Nome/Apelido Match</label>
+                <input type="text" id="repName" required placeholder="Ex: Valentina" class="w-full mt-1 bg-dark-900 border border-gray-700 rounded-lg p-2 text-xs text-gray-200">
+              </div>
+              <div>
+                <label class="text-[11px] text-gray-400">Nota da Persona</label>
+                <select id="repRating" class="w-full mt-1 bg-dark-900 border border-gray-700 rounded-lg p-2 text-xs text-gray-200">
+                  <option value="7.0">7.0/10 (Nível 1)</option>
+                  <option value="8.5" selected>8.5/10 (Nível 2)</option>
+                  <option value="9.5">9.5/10 (Nível 3)</option>
+                  <option value="10.0">10.0/10 (High-Value)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-[11px] text-gray-400">Local do Encontro</label>
+                <input type="text" id="repLocation" required placeholder="Ex: Bar de Drinks" class="w-full mt-1 bg-dark-900 border border-gray-700 rounded-lg p-2 text-xs text-gray-200">
+              </div>
+              <div>
+                <label class="text-[11px] text-gray-400">Resultado Final</label>
+                <select id="repOutcome" class="w-full mt-1 bg-dark-900 border border-gray-700 rounded-lg p-2 text-xs text-gray-200">
+                  <option value="sucesso">Sucesso / Conexão Completa</option>
+                  <option value="seguimento">Bom Encontro / Reagendado</option>
+                  <option value="frio">Esfriou / Perda de Frame</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-[11px] text-gray-400">Notas de Aprendizado (O que funcionou & o que errou)</label>
+              <textarea id="repNotes" rows="2" placeholder="Ex: O sequestro no início do bar funcionou perfeitamente, mas hesitei na transição..." class="w-full mt-1 bg-dark-900 border border-gray-700 rounded-lg p-2 text-xs text-gray-200 focus:outline-none focus:border-gold-500"></textarea>
+            </div>
+
+            <button type="submit" class="w-full py-2 rounded-xl gold-gradient text-dark-900 font-bold text-xs">
+              <i class="fa-solid fa-floppy-disk"></i> Salvar Relatório de Campo
+            </button>
+          </form>
+        </div>
+
+        <!-- Analytics Visual / Gráficos -->
+        <div class="glass-card p-4 rounded-2xl border border-gold-500/20 flex flex-col justify-between space-y-3">
+          <h3 class="font-bold text-xs gold-text uppercase tracking-wider"><i class="fa-solid fa-chart-pie"></i> Desempenho por Escalão de Nota</h3>
+          
+          <div class="flex-1 flex items-center justify-center p-2 min-h-[180px]">
+            <canvas id="reportsChart"></canvas>
+          </div>
+
+          <div id="aiPatternAnalysis" class="bg-dark-900 p-3 rounded-xl border border-gray-800 text-[11px] text-gray-300">
+            <span class="font-bold text-gold-400 block mb-0.5"><i class="fa-solid fa-microchip"></i> Diagnóstico de Padrões Pessoais:</span>
+            <p id="patternDiagnosisText">Registre pelo menos 2 encontros para ativar a análise inteligente de comportamento.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTÓRICO DE FIELD REPORTS -->
+      <div class="glass-card p-4 rounded-2xl border border-gold-500/20 space-y-3">
+        <h3 class="font-bold text-xs text-gray-200"><i class="fa-solid fa-clock-rotate-left text-gold-400"></i> Histórico de Relatórios Salvos</h3>
+        <div id="reportsList" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+          <!-- Injetado via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ABA 5: ESTRATÉGIA & SEQUESTRO -->
+    <section id="tab-strategy" class="hidden space-y-4 max-w-4xl mx-auto">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-200 flex items-center gap-2">
+          <i class="fa-solid fa-bolt text-gold-500"></i> Sequestro de Atenção & Scripts
+        </h2>
+      </div>
+
+      <div class="glass-card rounded-2xl p-4 border border-gold-500/20 space-y-4">
+        <p class="text-xs text-gray-300">Gatilhos mentais testados para interrupção imediata de padrão (*Pattern Interrupt*) no Tinder/Bumble.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="strategyScriptsContainer">
+          <!-- Injetado via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ABA 6: AUTORES & AUTORIDADES -->
+    <section id="tab-authors" class="hidden space-y-4 max-w-4xl mx-auto">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-200 flex items-center gap-2">
+          <i class="fa-solid fa-book-bookmark text-gold-500"></i> Biblioteca de Autores & Fundamentos
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="authorsContainer">
+        <!-- Injetado via JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- NAVIGATION BAR (FOOTER BAR) -->
+  <nav class="glass-card px-2 py-2 border-t border-gold-600/20 z-20">
+    <div class="max-w-md mx-auto flex items-center justify-around text-center">
+      <button onclick="switchTab('simulator')" id="nav-simulator" class="nav-btn flex flex-col items-center text-gold-400 text-[10px] font-medium">
+        <i class="fa-solid fa-comments text-base mb-0.5"></i> Chat
+      </button>
+
+      <button onclick="switchTab('vision')" id="nav-vision" class="nav-btn flex flex-col items-center text-gray-400 hover:text-gold-400 text-[10px] font-medium">
+        <i class="fa-solid fa-eye text-base mb-0.5"></i> Vision
+      </button>
+
+      <button onclick="switchTab('field')" id="nav-field" class="nav-btn flex flex-col items-center text-gray-400 hover:text-gold-400 text-[10px] font-medium">
+        <i class="fa-solid fa-glass-water text-base mb-0.5"></i> Encontro
+      </button>
+
+      <button onclick="switchTab('reports')" id="nav-reports" class="nav-btn flex flex-col items-center text-gray-400 hover:text-gold-400 text-[10px] font-medium">
+        <i class="fa-solid fa-chart-line text-base mb-0.5"></i> Diário
+      </button>
+
+      <button onclick="switchTab('strategy')" id="nav-strategy" class="nav-btn flex flex-col items-center text-gray-400 hover:text-gold-400 text-[10px] font-medium">
+        <i class="fa-solid fa-bolt text-base mb-0.5"></i> Scripts
+      </button>
+
+      <button onclick="switchTab('authors')" id="nav-authors" class="nav-btn flex flex-col items-center text-gray-400 hover:text-gold-400 text-[10px] font-medium">
+        <i class="fa-solid fa-book text-base mb-0.5"></i> Autores
+      </button>
+    </div>
+  </nav>
+
+  <!-- MODAL: GEMINI API KEY -->
+  <div id="apiModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="glass-card max-w-sm w-full rounded-2xl p-5 border border-gold-500/30 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-sm gold-text flex items-center gap-2"><i class="fa-solid fa-key"></i> Chave Gemini API</h3>
+        <button onclick="closeApiModal()" class="text-gray-400 text-sm"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p class="text-xs text-gray-300">Insira sua chave gratuita da Google Gemini API para ativar respostas ilimitadas por IA em tempo real.</p>
+      <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="w-full bg-dark-900 border border-gray-700 rounded-xl p-2.5 text-xs text-gray-100 focus:outline-none focus:border-gold-500">
+      <div class="flex space-x-2">
+        <button onclick="saveApiKey()" class="flex-1 py-2 rounded-xl gold-gradient text-dark-900 font-bold text-xs">Salvar Chave</button>
+        <button onclick="clearApiKey()" class="px-3 py-2 rounded-xl bg-dark-700 text-gray-300 text-xs">Remover</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: GALERIA DE FOTOS -->
+  <div id="galleryModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="glass-card max-w-md w-full rounded-2xl p-4 border border-gold-500/30 space-y-3">
+      <div class="flex items-center justify-between">
+        <h3 id="galleryTitle" class="font-bold text-sm text-gray-100">Fotos do Perfil</h3>
+        <button onclick="closeGalleryModal()" class="text-gray-400 text-sm"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="galleryGrid" class="grid grid-cols-2 gap-2 max-h-80 overflow-y-auto">
+        <!-- Injetado via JS -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // DATA APP STATE
+    const state = {
+      activeTab: 'simulator',
+      geminiApiKey: localStorage.getItem('eros_gemini_key') || '',
+      audioEnabled: true,
+      currentPersonaIndex: 0,
+      attraction: 50,
+      personas: [
+        {
+          name: 'Sofia', rating: '7.0', level: 'e1', archetype: 'Receptiva & Direta',
+          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+          photos: ['https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80'],
+          prompt: 'Sofia, 7.0/10, receptiva, sem jogos mentais.',
+          greeting: 'Oi! Gostei da sua foto na praia. Você vai para lá direto?'
+        },
+        {
+          name: 'Beatriz', rating: '7.5', level: 'e1', archetype: 'Comunicativa & Leve',
+          avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80',
+          photos: ['https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80'],
+          prompt: 'Beatriz, 7.5/10, gosta de papo fluido.',
+          greeting: 'Hey! Espero que você tenha algo mais interessante do que um "oi tudo bem" haha.'
+        },
+        {
+          name: 'Sienna', rating: '8.0', level: 'e2', archetype: 'Culta & Exigente',
+          avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=300&q=80',
+          photos: ['https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80'],
+          prompt: 'Sienna, 8.0/10, odeia tom de entrevista.',
+          greeting: 'Me convença em uma frase de que você não é mais um clichê de aplicativo.'
+        },
+        {
+          name: 'Larissa', rating: '8.5', level: 'e2', archetype: 'Inflacionada & Festiva',
+          avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=300&q=80',
+          photos: ['https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=600&q=80'],
+          prompt: 'Larissa, 8.5/10, acostumada com bajulação.',
+          greeting: 'Minhas notificações não param. O que você tem de diferente?'
+        },
+        {
+          name: 'Isabella', rating: '9.0', level: 'e3', archetype: 'Misteriosa & Shit-Tester',
+          avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80',
+          photos: ['https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80'],
+          prompt: 'Isabella, 9.0/10, sarcástica e altamente defensiva.',
+          greeting: 'Você parece o tipo de cara que ensaia as frases antes de mandar. Acertei?'
+        },
+        {
+          name: 'Valentina', rating: '9.5', level: 'e3', archetype: 'Aventureira & Impositiva',
+          avatar: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=300&q=80',
+          photos: ['https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=600&q=80'],
+          prompt: 'Valentina, 9.5/10, confiante e desafiadora.',
+          greeting: 'Não tenho paciência para conversas mornas. Qual é o seu risco mais recente?'
+        },
+        {
+          name: 'Giselle', rating: '10.0', level: 'e3', archetype: 'Socialite & Ultra High-Value',
+          avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=300&q=80',
+          photos: ['https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=600&q=80'],
+          prompt: 'Giselle, 10.0/10, padrão altíssimo de exigência.',
+          greeting: 'Dificilmente respondo aqui. Escreva algo que realmente valha meu tempo.'
+        }
+      ],
+      chatLogs: {},
+      fieldReports: JSON.parse(localStorage.getItem('eros_field_reports') || '[]'),
+      authors: [
+        { name: 'Robert Greene', book: 'A Arte da Sedução', area: 'Psicologia & Tensão', desc: 'Sedução Fria, criação de mistério e alternância de presença e ausência para valorização percebida.' },
+        { name: 'Oren Klaff', book: 'Pitch Anything', area: 'Controle de Frame', desc: 'Quebra de enquadramento, Sequestro de Atenção (Pattern Interrupt) e erradicação do tom de busca por aprovação.' },
+        { name: 'Geoffrey Miller', book: 'The Mating Mind', area: 'Psicologia Evolutiva', desc: 'Sinalização de fitness mental através do humor, perspicácia e leitura não-verbal.' },
+        { name: 'Ian Rowland', book: 'Full Facts Book of Cold Reading', area: 'Leitura Fria & PNL', desc: 'Diagnósticos de personalidade instantâneos a partir de detalhes visuais mínimos nas fotos.' }
+      ],
+      strategyScripts: [
+        { title: 'Inversão da Dinâmica', script: 'Tenho uma péssima notícia sobre o seu perfil...' },
+        { title: 'Cold Reading Provocativo', script: 'Sua terceira foto tem exatamente a energia de quem atrai confusão e finge que não tem nada a ver com isso.' },
+        { title: 'Quebra de Padrão Estético', script: 'Prometo não fazer nenhuma pergunta sobre a sua beleza se você prometer não responder com "haha sim".' }
+      ]
+    };
+
+    let chartInstance = null;
+
+    // INIT APP
+    window.addEventListener('DOMContentLoaded', () => {
+      renderPersonasCards('all');
+      selectPersona(0);
+      renderAuthors();
+      renderStrategyScripts();
+      renderFieldReports();
+      initChart();
+      updateAiBadge();
+    });
+
+    // NAVIGATION
+    function switchTab(tabId) {
+      document.querySelectorAll('main > section').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+      
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('text-gold-400');
+        btn.classList.add('text-gray-400');
+      });
+      document.getElementById(`nav-${tabId}`).classList.add('text-gold-400');
+      state.activeTab = tabId;
+    }
+
+    // PERSONAS RENDER
+    function filterPersonas(level) {
+      renderPersonasCards(level);
+    }
+
+    function renderPersonasCards(level) {
+      const container = document.getElementById('personaCardsContainer');
+      container.innerHTML = '';
+      state.personas.forEach((p, idx) => {
+        if (level !== 'all' && p.level !== level) return;
+        const card = document.createElement('div');
+        card.className = `glass-card p-2 rounded-xl cursor-pointer transition border hover:border-gold-500/50 flex items-center space-x-2 ${state.currentPersonaIndex === idx ? 'border-gold-500 bg-gold-500/10' : ''}`;
+        card.onclick = () => selectPersona(idx);
+        card.innerHTML = `
+          <img src="${p.avatar}" class="w-10 h-10 rounded-lg object-cover">
+          <div class="overflow-hidden">
+            <div class="flex items-center space-x-1">
+              <span class="font-bold text-xs text-gray-200 truncate">${p.name}</span>
+              <span class="text-[9px] px-1 rounded bg-gold-500/20 text-gold-400 font-bold">${p.rating}</span>
+            </div>
+            <span class="text-[10px] text-gray-400 truncate block">${p.archetype}</span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function selectPersona(idx) {
+      state.currentPersonaIndex = idx;
+      const p = state.personas[idx];
+      document.getElementById('activePersonaAvatar').src = p.avatar;
+      document.getElementById('activePersonaName').innerText = p.name;
+      document.getElementById('activePersonaRating').innerText = `${p.rating}/10`;
+      document.getElementById('activePersonaArchetype').innerText = p.archetype;
+      
+      if (!state.chatLogs[p.name]) {
+        state.chatLogs[p.name] = [{ sender: 'persona', text: p.greeting }];
+      }
+      renderChatMessages();
+      renderPersonasCards('all');
+    }
+
+    function renderChatMessages() {
+      const p = state.personas[state.currentPersonaIndex];
+      const container = document.getElementById('chatMessages');
+      container.innerHTML = '';
+      const logs = state.chatLogs[p.name] || [];
+      
+      logs.forEach(msg => {
+        const div = document.createElement('div');
+        div.className = `flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`;
+        div.innerHTML = `
+          <div class="max-w-[80%] rounded-2xl px-3.5 py-2 text-xs ${msg.sender === 'user' ? 'gold-gradient text-dark-900 font-medium rounded-br-none' : 'bg-dark-800 text-gray-200 border border-gray-700 rounded-bl-none'} flex items-center justify-between gap-2">
+            <span>${msg.text}</span>
+            ${msg.sender === 'persona' ? `<button onclick="speakText('${msg.text}')" class="text-gray-400 hover:text-gold-400 text-[10px]"><i class="fa-solid fa-volume-high"></i></button>` : ''}
+          </div>
+        `;
+        container.appendChild(div);
+      });
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function sendChatMessage() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const p = state.personas[state.currentPersonaIndex];
+      state.chatLogs[p.name].push({ sender: 'user', text: text });
+      input.value = '';
+      renderChatMessages();
+
+      // Trigger Advisor & Answer
+      processAdvisorFeedback(text, p);
+      setTimeout(() => generatePersonaReply(text, p), 800);
+    }
+
+    function handleChatKeyPress(e) {
+      if (e.key === 'Enter') sendChatMessage();
+    }
+
+    function processAdvisorFeedback(text, p) {
+      const score = Math.min(10, Math.max(3, (text.length > 20 ? 8 : 5) + (parseFloat(p.rating) > 8.5 ? -1 : 1)));
+      document.getElementById('advisorBanner').classList.remove('hidden');
+      document.getElementById('advisorScore').innerText = `Score: ${score.toFixed(1)}/10`;
+      document.getElementById('advisorText').innerText = score > 7 ? 'Abordagem forte! Bom enquadramento e sem busca por validação.' : 'Tom de entrevista detectado. Use um Sequestro de Atenção.';
+      
+      state.attraction = Math.min(100, Math.max(10, state.attraction + (score > 7 ? 10 : -10)));
+      document.getElementById('attractionBar').style.width = `${state.attraction}%`;
+    }
+
+    function generatePersonaReply(userText, p) {
+      let reply = "Interessante... mas você sempre é tão direto assim?";
+      if (parseFloat(p.rating) >= 9.5) reply = "Gostei da audácia, mas ainda não me convenceu.";
+      
+      state.chatLogs[p.name].push({ sender: 'persona', text: reply });
+      renderChatMessages();
+      if (state.audioEnabled) speakText(reply);
+    }
+
+    // SPEECH SYNTHESIS & VOICE INPUT
+    function speakText(text) {
+      if ('speechSynthesis' in window) {
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'pt-BR';
+        window.speechSynthesis.speak(utter);
+      }
+    }
+
+    function startVoiceInput() {
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const rec = new SpeechRec();
+        rec.lang = 'pt-BR';
+        rec.onresult = (e) => {
+          document.getElementById('chatInput').value = e.results[0][0].transcript;
+        };
+        rec.start();
+      } else {
+        alert('Reconhecimento de voz não suportado neste navegador.');
+      }
+    }
+
+    // RECURSO #4: FIELD REPORTS & ANALYTICS
+    function saveFieldReport(e) {
+      e.preventDefault();
+      const report = {
+        id: Date.now(),
+        name: document.getElementById('repName').value,
+        rating: document.getElementById('repRating').value,
+        location: document.getElementById('repLocation').value,
+        outcome: document.getElementById('repOutcome').value,
+        notes: document.getElementById('repNotes').value,
+        date: new Date().toLocaleDateString('pt-BR')
+      };
+
+      state.fieldReports.unshift(report);
+      localStorage.setItem('eros_field_reports', JSON.stringify(state.fieldReports));
+      document.getElementById('fieldReportForm').reset();
+      renderFieldReports();
+      updateDashboardStats();
+    }
+
+    function renderFieldReports() {
+      const container = document.getElementById('reportsList');
+      container.innerHTML = '';
+      
+      if (state.fieldReports.length === 0) {
+        container.innerHTML = '<p class="text-xs text-gray-500">Nenhum relatório de encontro registrado ainda.</p>';
+        return;
+      }
+
+      state.fieldReports.forEach(rep => {
+        const div = document.createElement('div');
+        div.className = 'bg-dark-900 p-3 rounded-xl border border-gray-800 text-xs flex flex-col space-y-1';
+        div.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-gray-200">${rep.name} (${rep.rating}/10)</span>
+            <span class="text-[10px] px-2 py-0.5 rounded ${rep.outcome === 'sucesso' ? 'bg-green-500/20 text-green-400' : 'bg-gold-500/20 text-gold-400'}">${rep.outcome.toUpperCase()}</span>
+          </div>
+          <p class="text-gray-400 text-[11px]"><i class="fa-solid fa-location-dot"></i> ${rep.location} • ${rep.date}</p>
+          <p class="text-gray-300 italic text-[11px]">"${rep.notes}"</p>
+        `;
+        container.appendChild(div);
+      });
+      updateDashboardStats();
+    }
+
+    function updateDashboardStats() {
+      const total = state.fieldReports.length;
+      document.getElementById('statTotalDates').innerText = total;
+
+      if (total > 0) {
+        const success = state.fieldReports.filter(r => r.outcome === 'sucesso').length;
+        const rate = Math.round((success / total) * 100);
+        document.getElementById('statConversionRate').innerText = `${rate}%`;
+
+        const avg = (state.fieldReports.reduce((acc, r) => acc + parseFloat(r.rating), 0) / total).toFixed(1);
+        document.getElementById('statAvgScore').innerText = `${avg}`;
+
+        document.getElementById('patternDiagnosisText').innerText = `Padrão Detectado: Excelente taxa de conversão em locais como bars/lounges. Mantenha o enquadramento inicial.`;
+      }
+      updateChartData();
+    }
+
+    function initChart() {
+      const ctx = document.getElementById('reportsChart').getContext('2d');
+      chartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Nível 1 (6-7.5)', 'Nível 2 (8-8.5)', 'Nível 3 (9-10)'],
+          datasets: [{
+            data: [1, 1, 1],
+            backgroundColor: ['#ca8a04', '#eab308', '#facc15'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#9ca3af', font: { size: 10 } } } }
+        }
+      });
+    }
+
+    function updateChartData() {
+      if (!chartInstance) return;
+      const n1 = state.fieldReports.filter(r => parseFloat(r.rating) <= 7.5).length || 1;
+      const n2 = state.fieldReports.filter(r => parseFloat(r.rating) > 7.5 && parseFloat(r.rating) <= 8.5).length || 1;
+      const n3 = state.fieldReports.filter(r => parseFloat(r.rating) > 8.5).length || 1;
+
+      chartInstance.data.datasets[0].data = [n1, n2, n3];
+      chartInstance.update();
+    }
+
+    // UTILS & SCRIPTS RENDER
+    function renderAuthors() {
+      const container = document.getElementById('authorsContainer');
+      container.innerHTML = '';
+      state.authors.forEach(a => {
+        const div = document.createElement('div');
+        div.className = 'glass-card p-4 rounded-xl border border-gold-500/20 space-y-1';
+        div.innerHTML = `
+          <h4 class="font-bold text-xs text-gold-400">${a.name}</h4>
+          <span class="text-[10px] text-gray-400 font-semibold block">${a.book} (${a.area})</span>
+          <p class="text-xs text-gray-300 mt-1">${a.desc}</p>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function renderStrategyScripts() {
+      const container = document.getElementById('strategyScriptsContainer');
+      container.innerHTML = '';
+      state.strategyScripts.forEach(s => {
+        const div = document.createElement('div');
+        div.className = 'bg-dark-900 p-3 rounded-xl border border-gray-800 space-y-2';
+        div.innerHTML = `
+          <span class="text-xs font-bold text-gold-400 block">${s.title}</span>
+          <p class="text-xs text-gray-200">${s.script}</p>
+          <div class="flex space-x-2">
+            <button onclick="copyScriptText('${s.script}')" class="px-2.5 py-1 rounded bg-dark-700 text-xs text-gray-300 hover:text-gold-400">Copiar</button>
+            <button onclick="useScriptInChat('${s.script}')" class="px-2.5 py-1 rounded gold-gradient text-dark-900 font-bold text-xs">Usar no Chat</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function injectHookScript() {
+      document.getElementById('chatInput').value = "Tenho uma péssima notícia sobre o seu perfil...";
+    }
+
+    function copyCurrentInput() {
+      const val = document.getElementById('chatInput').value;
+      if (val) copyScriptText(val);
+    }
+
+    function copyScriptText(txt) {
+      navigator.clipboard.writeText(txt);
+      alert('Texto copiado para a área de transferência!');
+    }
+
+    function useScriptInChat(txt) {
+      switchTab('simulator');
+      document.getElementById('chatInput').value = txt;
+    }
+
+    function toggleAudioSetting() {
+      state.audioEnabled = !state.audioEnabled;
+      document.getElementById('audioIcon').className = state.audioEnabled ? 'fa-solid fa-volume-high text-gold-400' : 'fa-solid fa-volume-xmark text-gray-500';
+    }
+
+    function openApiModal() { document.getElementById('apiModal').classList.remove('hidden'); }
+    function closeApiModal() { document.getElementById('apiModal').classList.add('hidden'); }
+    function saveApiKey() {
+      const k = document.getElementById('apiKeyInput').value;
+      if (k) {
+        state.geminiApiKey = k;
+        localStorage.setItem('eros_gemini_key', k);
+        updateAiBadge();
+        closeApiModal();
+      }
+    }
+    function clearApiKey() {
+      localStorage.removeItem('eros_gemini_key');
+      state.geminiApiKey = '';
+      updateAiBadge();
+      closeApiModal();
+    }
+    function updateAiBadge() {
+      const b = document.getElementById('aiModeBadge');
+      if (state.geminiApiKey) {
+        b.innerText = 'Modo: Gemini AI';
+        b.className = 'text-xs px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30';
+      } else {
+        b.innerText = 'Modo: Local';
+        b.className = 'text-xs px-2.5 py-1 rounded-full bg-gold-500/10 text-gold-400 border border-gold-500/20';
+      }
+    }
+
+    function openGalleryModal() {
+      const p = state.personas[state.currentPersonaIndex];
+      document.getElementById('galleryTitle').innerText = `Fotos de ${p.name}`;
+      const grid = document.getElementById('galleryGrid');
+      grid.innerHTML = p.photos.map(ph => `<img src="${ph}" class="w-full h-36 object-cover rounded-xl border border-gray-800">`).join('');
+      document.getElementById('galleryModal').classList.remove('hidden');
+    }
+    function closeGalleryModal() { document.getElementById('galleryModal').classList.add('hidden'); }
+
+    // FIELD SCENARIO SIMULATOR
+    function loadFieldScenario(type) {
+      const cardTitle = document.getElementById('scenarioTitle');
+      const cardDesc = document.getElementById('scenarioDescription');
+      const container = document.getElementById('scenarioChoices');
+      
+      if (type === 'drinks') {
+        cardTitle.innerText = "Bar de Drinks (15 min iniciais)";
+        cardDesc.innerText = "Ela chega, senta ao seu lado e olha o cardápio sem dizer muito. Como quebrar o gelo sem soar como entrevista?";
+        container.innerHTML = `
+          <button onclick="answerScenario(1)" class="w-full text-left p-2 rounded-lg bg-dark-800 hover:bg-dark-700 text-xs text-gray-200 border border-gray-700">A. "Você vem sempre aqui? O que recomenda beber?"</button>
+          <button onclick="answerScenario(2)" class="w-full text-left p-2 rounded-lg bg-dark-800 hover:bg-dark-700 text-xs text-gray-200 border border-gray-700">B. "Pela sua cara, você tem cara de quem pede o drink mais doce da carta."</button>
+        `;
+      }
+    }
+    function answerScenario(opt) {
+      alert(opt === 2 ? 'Excelente escolha! Provocação leve com Cold Reading.' : 'Cuidado: Pergunta clichê de entrevista.');
+    }
+  </script>
+</body>
+</html>
