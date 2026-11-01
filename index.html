@@ -923,23 +923,52 @@
     }
     function closeGalleryModal() { document.getElementById('galleryModal').classList.add('hidden'); }
 
-    // FIELD SCENARIO SIMULATOR
+    // FIELD SCENARIO SIMULATOR COMPLETO
     function loadFieldScenario(type) {
       const cardTitle = document.getElementById('scenarioTitle');
       const cardDesc = document.getElementById('scenarioDescription');
       const container = document.getElementById('scenarioChoices');
       
+      // Atualizar visual dos botões
+      document.querySelectorAll('#tab-field .flex.space-x-2 button').forEach(btn => {
+        btn.className = "px-3 py-1.5 rounded-lg bg-dark-700 text-gray-300 border border-gray-800";
+      });
+      
       if (type === 'drinks') {
+        if (event) event.target.className = "px-3 py-1.5 rounded-lg bg-gold-500 text-dark-900 font-bold";
         cardTitle.innerText = "Bar de Drinks (15 min iniciais)";
         cardDesc.innerText = "Ela chega, senta ao seu lado e olha o cardápio sem dizer muito. Como quebrar o gelo sem soar como entrevista?";
         container.innerHTML = `
           <button onclick="answerScenario(1)" class="w-full text-left p-2 rounded-lg bg-dark-800 hover:bg-dark-700 text-xs text-gray-200 border border-gray-700">A. "Você vem sempre aqui? O que recomenda beber?"</button>
           <button onclick="answerScenario(2)" class="w-full text-left p-2 rounded-lg bg-dark-800 hover:bg-dark-700 text-xs text-gray-200 border border-gray-700">B. "Pela sua cara, você tem cara de quem pede o drink mais doce da carta."</button>
         `;
+      } else if (type === 'cafe') {
+        if (event) event.target.className = "px-3 py-1.5 rounded-lg bg-gold-500 text-dark-900 font-bold";
+        cardTitle.innerText = "Café / Passeio à Tarde";
+        cardDesc.innerText = "Vocês estão caminhando por uma praça após pegarem o café. A conversa teve uma pausa de 10 segundos. O que fazer?";
+        container.innerHTML = `
+          <button onclick="answerScenario(3)" class="w-full text-left p-2 rounded-lg bg-dark-800 hover:bg-dark-700 text-xs text-gray-200 border border-gray-700">A. Ficar nervoso e puxar um assunto aleatório sobre o tempo.</button>
+          <button onclick="answerScenario(2)" class="w-full text-left p-2 rounded-lg bg-dark-800 hover:bg-dark-700 text-xs text-gray-200 border border-gray-700">B. Manter o contato visual, sorrir levemente e deixar o silêncio confortável sem pressa.</button>
+        `;
+      } else if (type === 'dinner') {
+        if (event) event.target.className = "px-3 py-1.5 rounded-lg bg-gold-500 text-dark-900 font-bold";
+        cardTitle.innerText = "Jantar / Restaurante";
+        cardDesc.innerText = "O garçom traz a conta ao final do jantar. Como gerenciar este momento mantendo o enquadramento correto?";
+        container.innerHTML = `
+          <button onclick="answerScenario(2)" class="w-full text-left p-2 rounded-lg bg-dark-800 hover:bg-dark-700 text-xs text-gray-200 border border-gray-700">A. Pegar a conta naturalmente sem fazer disso um assunto ou drama de discussão.</button>
+          <button onclick="answerScenario(1)" class="w-full text-left p-2 rounded-lg bg-dark-800 hover:bg-dark-700 text-xs text-gray-200 border border-gray-700">B. Insistir repetidamente para dividir o valor exato no centavo.</button>
+        `;
       }
     }
+
     function answerScenario(opt) {
-      alert(opt === 2 ? 'Excelente escolha! Provocação leve com Cold Reading.' : 'Cuidado: Pergunta clichê de entrevista.');
+      if (opt === 2) {
+        alert('Excelente escolha! Demonstra controle de frame e confiança sem necessitar de validação.');
+      } else if (opt === 3) {
+        alert('Cuidado: Demonstrar ansiedade com o silêncio passa insegurança.');
+      } else {
+        alert('Atenção: Essa atitude demonstra hesitação ou tom de busca por aprovação.');
+      }
     }
   </script>
 </body>
