@@ -102,10 +102,8 @@
         <button onclick="filterPersonas('e3')" class="persona-filter-btn px-3 py-1.5 rounded-lg bg-dark-700 text-gray-300 border border-gray-800">Nível 3 (9.0 - 10.0)</button>
       </div>
 
-      <!-- Carrossel/Seleção de Personas -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="personaCardsContainer">
-        <!-- Injetado via Javascript -->
-      </div>
+      <!-- Carrossel de Personas -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="personaCardsContainer"></div>
 
       <!-- ÁREA DE CHAT COMPLETA -->
       <div class="glass-card rounded-2xl flex flex-col h-[520px] overflow-hidden border border-gold-500/20">
@@ -140,11 +138,9 @@
         </div>
 
         <!-- Mensagens do Chat -->
-        <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-3 custom-scrollbar bg-dark-900/60">
-          <!-- Mensagens Injetadas via JS -->
-        </div>
+        <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-3 custom-scrollbar bg-dark-900/60"></div>
 
-        <!-- Eros Advisor Banner (Feedback em Tempo Real) -->
+        <!-- Advisor Banner -->
         <div id="advisorBanner" class="hidden px-4 py-2.5 bg-dark-800 border-t border-b border-gold-500/30 flex items-start space-x-3 text-xs">
           <i class="fa-solid fa-brain text-gold-400 text-base mt-0.5"></i>
           <div class="flex-1">
@@ -195,7 +191,7 @@
         <p class="text-xs text-gray-300">Carregue um print da conversa do Tinder, Instagram ou WhatsApp para obter uma análise fria do enquadramento e sugestões de resposta calibradas.</p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Upload Area Totalmente Clicável para Mobile -->
+          <!-- Area de Upload Clicável em Telas Mobile -->
           <div class="border-2 border-dashed border-gray-700 hover:border-gold-500/50 rounded-xl p-6 flex flex-col items-center justify-center text-center bg-dark-900/50 relative cursor-pointer min-h-[160px]">
             <input type="file" id="visionFileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" onchange="handleVisionImageUpload(event)">
             <i class="fa-solid fa-cloud-arrow-up text-3xl text-gold-400 mb-2 pointer-events-none"></i>
@@ -561,7 +557,7 @@
       fieldReports: JSON.parse(localStorage.getItem('eros_field_reports') || '[]'),
       
       authors: [
-        { name: 'Robert Greene', book: 'A Arte da Sedução / 48 Leis do Poder', area: 'Estratégia & Arquétipos', desc: 'Sedução Fria, criação de mistério, manipulação de ausência e alternância de atenção para inflacionar o valor percebido.' },
+        { name: 'Robert Greeeeene', book: 'A Arte da Sedução / 48 Leis do Poder', area: 'Estratégia & Arquétipos', desc: 'Sedução Fria, criação de mistério, manipulação de ausência e alternância de atenção para inflacionar o valor percebido.' },
         { name: 'Oren Klaff', book: 'Pitch Anything', area: 'Controle de Frame & Foco', desc: 'Dominância de enquadramento, Sequestro de Atenção (Pattern Interrupt) e erradicação total do tom de busca por aprovação (Seeker Frame).' },
         { name: 'Geoffrey Miller', book: 'The Mating Mind / Mating Intelligence', area: 'Psicologia Evolutiva', desc: 'Sinalização de fitness mental/social e como a inteligência, perspicácia e o humor agem como indicadores diretos de genoma adaptativo.' },
         { name: 'Robert Cialdini', book: 'As Armas da Persuasão / Pré-suasão', area: 'Gatilhos de Influência', desc: 'Princípios de Escassez, Prova Social, Contraste e Reciprocidade aplicados ao posicionamento inicial da conversa.' },
@@ -739,7 +735,7 @@
       if (state.audioEnabled) speakText(reply);
     }
 
-    // EROS VISION AI - CAPTURA DE IMAGEM & ANÁLISE CORRIGIDOS
+    // EROS VISION AI - CAPTURA DE IMAGEM & ANÁLISE COM FALLBACK MULTI-MODELO
     function handleVisionImageUpload(e) {
       const file = e.target.files && e.target.files[0];
       if (file) {
@@ -756,83 +752,95 @@
       }
     }
 
-   async function analyzeVisionPrint() {
-  const apiKey = (localStorage.getItem('eros_gemini_key') || state.geminiApiKey || '').trim();
-  const rating = document.getElementById('visionRating').value;
-  const textInput = document.getElementById('visionTextInput').value.trim();
-  const btn = document.getElementById('btnAnalisarVision');
-  const resultArea = document.getElementById('visionResult');
-  const diagnosisText = document.getElementById('visionDiagnosisText');
+    async function analyzeVisionPrint() {
+      const apiKey = (localStorage.getItem('eros_gemini_key') || state.geminiApiKey || '').trim();
+      const rating = document.getElementById('visionRating').value;
+      const textInput = document.getElementById('visionTextInput').value.trim();
+      const btn = document.getElementById('btnAnalisarVision');
+      const resultArea = document.getElementById('visionResult');
+      const diagnosisText = document.getElementById('visionDiagnosisText');
 
-  if (!apiKey) {
-    alert('Por favor, insira a sua chave da Gemini API no topo (ícone da chave amarela)!');
-    return;
-  }
+      if (!apiKey) {
+        alert('Por favor, insira a sua chave da Gemini API no topo (ícone da chave amarela)!');
+        return;
+      }
 
-  if (!state.visionImageBase64 && !textInput) {
-    alert('Por favor, carregue o print ou digite o texto da conversa para analisar.');
-    return;
-  }
+      if (!state.visionImageBase64 && !textInput) {
+        alert('Por favor, carregue o print ou digite o texto da conversa para analisar.');
+        return;
+      }
 
-  btn.innerText = '🔄 Processando Análise de Frame...';
-  btn.disabled = true;
+      btn.innerText = '🔄 Processando Análise de Frame...';
+      btn.disabled = true;
 
-  try {
-    const parts = [];
+      const parts = [];
+      if (state.visionImageBase64) {
+        const base64Data = state.visionImageBase64.split(',')[1];
+        const mimeType = state.visionImageBase64.split(';')[0].split(':')[1] || 'image/png';
+        parts.push({
+          inline_data: {
+            mime_type: mimeType,
+            data: base64Data
+          }
+        });
+      }
 
-    if (state.visionImageBase64) {
-      const base64Data = state.visionImageBase64.split(',')[1];
-      const mimeType = state.visionImageBase64.split(';')[0].split(':')[1] || 'image/png';
-      parts.push({
-        inline_data: {
-          mime_type: mimeType,
-          data: base64Data
-        }
-      });
-    }
-
-    const promptText = `Atue como o motor EROS VISION, especialista em dinâmica de atração, sedução e psicologia de enquadramento.
+      const promptText = `Atue como o motor EROS VISION, especialista em dinâmica de atração, sedução e psicologia de enquadramento.
 Analise este print/conversa com base no nível do match informado: ${rating}/10.
 Texto adicional da conversa: "${textInput}".
 
-Retorne um diagnóstico objetivo de enquadramento (quem tem o controle do frame) e 3 sugestões de resposta calibradas (Opção A: Sequestro de Atenção, Opção B: Push-Pull, Opção C: Fechamento).`;
+Retorne um diagnóstico objetivo de enquadramento (quem tem o controle do frame) e 3 sugestões de resposta calibradas:
+- Opção A (Sequestro de Atenção / Pattern Interrupt)
+- Opção B (Push-Pull / Provocação Calibrada)
+- Opção C (Fechamento / Chamada para o Encontro).`;
 
-    parts.push({ text: promptText });
+      parts.push({ text: promptText });
 
-    // Endpoint formatado corretamente
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+      // Lista de modelos ordenados para tentativa de execução (Fallback)
+      const modelsToTry = [
+        'gemini-1.5-flash',
+        'gemini-2.0-flash',
+        'gemini-1.5-pro'
+      ];
 
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: parts }]
-      })
-    });
+      let rawText = null;
+      let lastError = null;
 
-    const data = await response.json();
-    
-    if (data.error) {
-      throw new Error(data.error.message || 'Erro de autenticação ou modelo');
+      for (const modelName of modelsToTry) {
+        try {
+          const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: parts }] })
+          });
+
+          const data = await response.json();
+          if (data.candidates && data.candidates[0].content.parts[0].text) {
+            rawText = data.candidates[0].content.parts[0].text;
+            break; // Sucesso na resposta
+          } else if (data.error) {
+            lastError = data.error.message;
+          }
+        } catch (err) {
+          lastError = err.message;
+        }
+      }
+
+      if (rawText) {
+        diagnosisText.innerHTML = rawText.replace(/\n/g, '<br>');
+        document.getElementById('optAText').innerText = "Tenho uma péssima notícia sobre o seu perfil...";
+        document.getElementById('optBText').innerText = "Você parece simpática, mas tem cara de quem causa problemas.";
+        document.getElementById('optCText').innerText = "Qual é o seu drink favorito para quando nos encontrarmos esta semana?";
+        resultArea.classList.remove('hidden');
+      } else {
+        alert('Erro na análise: ' + (lastError || 'Não foi possível conectar com os modelos Gemini. Verifique sua chave.'));
+      }
+
+      btn.innerText = '⚡ Analisar Print e Gerar Respostas';
+      btn.disabled = false;
     }
 
-    const rawText = data.candidates[0].content.parts[0].text;
-    
-    diagnosisText.innerHTML = rawText.replace(/\n/g, '<br>');
-    document.getElementById('optAText').innerText = "Tenho uma péssima notícia sobre o seu perfil...";
-    document.getElementById('optBText').innerText = "Você parece simpática, mas tem cara de quem causa problemas.";
-    document.getElementById('optCText').innerText = "Qual é o seu drink favorito para quando nos encontrarmos esta semana?";
-
-    resultArea.classList.remove('hidden');
-
-  } catch (err) {
-    alert('Erro na análise: ' + err.message);
-    console.error(err);
-  } finally {
-    btn.innerText = '⚡ Analisar Print e Gerar Respostas';
-    btn.disabled = false;
-  }
-}
     function copyText(elementId) {
       const txt = document.getElementById(elementId).innerText;
       if (txt && txt !== '---') {
