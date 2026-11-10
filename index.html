@@ -798,50 +798,34 @@ Retorne um diagnóstico objetivo de enquadramento (quem tem o controle do frame)
 
     parts.push({ text: promptText });
 
-    // Lista de nomes limpos dos modelos (sem prefixo 'models/')
-    const modelsToTry = [
-      'gemini-1.5-flash',
-      'gemini-2.0-flash',
-      'gemini-1.5-pro'
-    ];
+    // Endpoint fixo com o modelo estável oficial
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-    let rawText = null;
-    let lastError = null;
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: parts }] })
+    });
 
-    for (const modelName of modelsToTry) {
-      try {
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: parts }] })
-        });
+    const data = await response.json();
 
-        const data = await response.json();
-        
-        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
-          rawText = data.candidates[0].content.parts[0].text;
-          break;
-        } else if (data.error) {
-          lastError = data.error.message;
-        }
-      } catch (err) {
-        lastError = err.message;
-      }
+    if (data.error) {
+      throw new Error(`[${data.error.code}] ${data.error.message}`);
     }
 
-    if (rawText) {
+    if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
+      const rawText = data.candidates[0].content.parts[0].text;
       diagnosisText.innerHTML = rawText.replace(/\n/g, '<br>');
       document.getElementById('optAText').innerText = "Tenho uma péssima notícia sobre o seu perfil...";
       document.getElementById('optBText').innerText = "Você parece simpática, mas tem cara de quem causa problemas.";
       document.getElementById('optCText').innerText = "Qual é o seu drink favorito para quando nos encontrarmos esta semana?";
       resultArea.classList.remove('hidden');
     } else {
-      alert('Erro na análise: ' + (lastError || 'Verifique se a chave de API inserida está correta.'));
+      alert('Nenhuma resposta gerada pela API.');
     }
 
   } catch (err) {
-    alert('Erro de execução: ' + err.message);
+    alert('Erro na API: ' + err.message);
     console.error(err);
   } finally {
     btn.innerText = '⚡ Analisar Print e Gerar Respostas';
