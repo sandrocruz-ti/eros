@@ -753,39 +753,41 @@
     }
 
     async function analyzeVisionPrint() {
-      const apiKey = (localStorage.getItem('eros_gemini_key') || state.geminiApiKey || '').trim();
-      const rating = document.getElementById('visionRating').value;
-      const textInput = document.getElementById('visionTextInput').value.trim();
-      const btn = document.getElementById('btnAnalisarVision');
-      const resultArea = document.getElementById('visionResult');
-      const diagnosisText = document.getElementById('visionDiagnosisText');
+  const apiKey = (localStorage.getItem('eros_gemini_key') || state.geminiApiKey || '').trim();
+  const rating = document.getElementById('visionRating').value;
+  const textInput = document.getElementById('visionTextInput').value.trim();
+  const btn = document.getElementById('btnAnalisarVision');
+  const resultArea = document.getElementById('visionResult');
+  const diagnosisText = document.getElementById('visionDiagnosisText');
 
-      if (!apiKey) {
-        alert('Por favor, insira a sua chave da Gemini API no topo (ícone da chave amarela)!');
-        return;
-      }
+  if (!apiKey) {
+    alert('Por favor, insira a sua chave da Gemini API no topo (ícone da chave amarela)!');
+    return;
+  }
 
-      if (!state.visionImageBase64 && !textInput) {
-        alert('Por favor, carregue o print ou digite o texto da conversa para analisar.');
-        return;
-      }
+  if (!state.visionImageBase64 && !textInput) {
+    alert('Por favor, carregue o print ou digite o texto da conversa para analisar.');
+    return;
+  }
 
-      btn.innerText = '🔄 Processando Análise de Frame...';
-      btn.disabled = true;
+  btn.innerText = '🔄 Processando Análise de Frame...';
+  btn.disabled = true;
 
-      const parts = [];
-      if (state.visionImageBase64) {
-        const base64Data = state.visionImageBase64.split(',')[1];
-        const mimeType = state.visionImageBase64.split(';')[0].split(':')[1] || 'image/png';
-        parts.push({
-          inline_data: {
-            mime_type: mimeType,
-            data: base64Data
-          }
-        });
-      }
+  try {
+    const parts = [];
 
-      const promptText = `Atue como o motor EROS VISION, especialista em dinâmica de atração, sedução e psicologia de enquadramento.
+    if (state.visionImageBase64) {
+      const base64Data = state.visionImageBase64.split(',')[1];
+      const mimeType = state.visionImageBase64.split(';')[0].split(':')[1] || 'image/png';
+      parts.push({
+        inline_data: {
+          mime_type: mimeType,
+          data: base64Data
+        }
+      });
+    }
+
+    const promptText = `Atue como o motor EROS VISION, especialista em dinâmica de atração, sedução e psicologia de enquadramento.
 Analise este print/conversa com base no nível do match informado: ${rating}/10.
 Texto adicional da conversa: "${textInput}".
 
@@ -794,52 +796,57 @@ Retorne um diagnóstico objetivo de enquadramento (quem tem o controle do frame)
 - Opção B (Push-Pull / Provocação Calibrada)
 - Opção C (Fechamento / Chamada para o Encontro).`;
 
-      parts.push({ text: promptText });
+    parts.push({ text: promptText });
 
-      // Lista de modelos ordenados para tentativa de execução (Fallback)
-      const modelsToTry = [
-        'gemini-1.5-flash',
-        'gemini-2.0-flash',
-        'gemini-1.5-pro'
-      ];
+    // Modelos compatíveis com o Nível Gratuito
+    const modelsToTry = [
+      'gemini-1.5-flash-latest',
+      'gemini-1.5-flash',
+      'gemini-2.0-flash-exp'
+    ];
 
-      let rawText = null;
-      let lastError = null;
+    let rawText = null;
+    let lastError = null;
 
-      for (const modelName of modelsToTry) {
-        try {
-          const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-          const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: parts }] })
-          });
+    for (const modelName of modelsToTry) {
+      try {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: parts }] })
+        });
 
-          const data = await response.json();
-          if (data.candidates && data.candidates[0].content.parts[0].text) {
-            rawText = data.candidates[0].content.parts[0].text;
-            break; // Sucesso na resposta
-          } else if (data.error) {
-            lastError = data.error.message;
-          }
-        } catch (err) {
-          lastError = err.message;
+        const data = await response.json();
+        if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
+          rawText = data.candidates[0].content.parts[0].text;
+          break;
+        } else if (data.error) {
+          lastError = data.error.message;
         }
+      } catch (err) {
+        lastError = err.message;
       }
-
-      if (rawText) {
-        diagnosisText.innerHTML = rawText.replace(/\n/g, '<br>');
-        document.getElementById('optAText').innerText = "Tenho uma péssima notícia sobre o seu perfil...";
-        document.getElementById('optBText').innerText = "Você parece simpática, mas tem cara de quem causa problemas.";
-        document.getElementById('optCText').innerText = "Qual é o seu drink favorito para quando nos encontrarmos esta semana?";
-        resultArea.classList.remove('hidden');
-      } else {
-        alert('Erro na análise: ' + (lastError || 'Não foi possível conectar com os modelos Gemini. Verifique sua chave.'));
-      }
-
-      btn.innerText = '⚡ Analisar Print e Gerar Respostas';
-      btn.disabled = false;
     }
+
+    if (rawText) {
+      diagnosisText.innerHTML = rawText.replace(/\n/g, '<br>');
+      document.getElementById('optAText').innerText = "Tenho uma péssima notícia sobre o seu perfil...";
+      document.getElementById('optBText').innerText = "Você parece simpática, mas tem cara de quem causa problemas.";
+      document.getElementById('optCText').innerText = "Qual é o seu drink favorito para quando nos encontrarmos esta semana?";
+      resultArea.classList.remove('hidden');
+    } else {
+      alert('Erro na análise: ' + (lastError || 'Verifique se a chave de API inserida está correta.'));
+    }
+
+  } catch (err) {
+    alert('Erro de execução: ' + err.message);
+    console.error(err);
+  } finally {
+    btn.innerText = '⚡ Analisar Print e Gerar Respostas';
+    btn.disabled = false;
+  }
+}
 
     function copyText(elementId) {
       const txt = document.getElementById(elementId).innerText;
