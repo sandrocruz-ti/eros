@@ -18,12 +18,13 @@
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
 
   <!-- Registo do Service Worker para suporte Offline -->
+ <!-- Desativação Forçada do Service Worker e Cache -->
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then(reg => console.log('SW registrado com sucesso:', reg.scope))
-          .catch(err => console.log('Falha ao registrar SW:', err));
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        for (let registration of registrations) {
+          registration.unregister();
+        }
       });
     }
   </script>
