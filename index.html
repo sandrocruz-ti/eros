@@ -798,8 +798,8 @@ Retorne um diagnóstico objetivo de enquadramento (quem tem o controle do frame)
 
     parts.push({ text: promptText });
 
-    // Endpoint fixo com o modelo estável oficial
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // Endpoint v1 oficial (compatível com contas Free sem exigir v1beta)
+    const endpoint = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(endpoint, {
       method: 'POST',
@@ -810,7 +810,7 @@ Retorne um diagnóstico objetivo de enquadramento (quem tem o controle do frame)
     const data = await response.json();
 
     if (data.error) {
-      throw new Error(`[${data.error.code}] ${data.error.message}`);
+      throw new Error(data.error.message);
     }
 
     if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
@@ -821,11 +821,11 @@ Retorne um diagnóstico objetivo de enquadramento (quem tem o controle do frame)
       document.getElementById('optCText').innerText = "Qual é o seu drink favorito para quando nos encontrarmos esta semana?";
       resultArea.classList.remove('hidden');
     } else {
-      alert('Nenhuma resposta gerada pela API.');
+      alert('Nenhuma resposta retornada pela API.');
     }
 
   } catch (err) {
-    alert('Erro na API: ' + err.message);
+    alert('Erro de comunicação API: ' + err.message);
     console.error(err);
   } finally {
     btn.innerText = '⚡ Analisar Print e Gerar Respostas';
