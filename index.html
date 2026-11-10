@@ -752,7 +752,7 @@
       }
     }
 
-    async function analyzeVisionPrint() {
+   async function analyzeVisionPrint() {
   const apiKey = (localStorage.getItem('eros_gemini_key') || state.geminiApiKey || '').trim();
   const rating = document.getElementById('visionRating').value;
   const textInput = document.getElementById('visionTextInput').value.trim();
@@ -798,11 +798,11 @@ Retorne um diagnóstico objetivo de enquadramento (quem tem o controle do frame)
 
     parts.push({ text: promptText });
 
-    // Modelos compatíveis com o Nível Gratuito
+    // Lista de nomes limpos dos modelos (sem prefixo 'models/')
     const modelsToTry = [
-      'gemini-1.5-flash-latest',
       'gemini-1.5-flash',
-      'gemini-2.0-flash-exp'
+      'gemini-2.0-flash',
+      'gemini-1.5-pro'
     ];
 
     let rawText = null;
@@ -818,7 +818,8 @@ Retorne um diagnóstico objetivo de enquadramento (quem tem o controle do frame)
         });
 
         const data = await response.json();
-        if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
+        
+        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
           rawText = data.candidates[0].content.parts[0].text;
           break;
         } else if (data.error) {
@@ -847,7 +848,6 @@ Retorne um diagnóstico objetivo de enquadramento (quem tem o controle do frame)
     btn.disabled = false;
   }
 }
-
     function copyText(elementId) {
       const txt = document.getElementById(elementId).innerText;
       if (txt && txt !== '---') {
