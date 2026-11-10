@@ -340,4 +340,802 @@
         </div>
         <div class="glass-card p-3 rounded-xl border border-gold-500/20 text-center">
           <span class="text-[10px] text-gray-400 uppercase tracking-wider block">Score Médio</span>
-          <span id="statAvgScore" class="text
+          <span id="statAvgScore" class="text-xl font-extrabold text-gold-400 mt-1 block">0.0</span>
+        </div>
+        <div class="glass-card p-3 rounded-xl border border-gold-500/20 text-center">
+          <span class="text-[10px] text-gray-400 uppercase tracking-wider block">Nível Predominante</span>
+          <span id="statTopLevel" class="text-xl font-extrabold text-purple-400 mt-1 block">--</span>
+        </div>
+      </div>
+
+      <!-- PAINEL PRINCIPAL: FORMULÁRIO DE REGISTRO E GRÁFICOS -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Formulário de Novo Field Report -->
+        <div class="glass-card p-4 rounded-2xl border border-gold-500/20 space-y-3">
+          <h3 class="font-bold text-xs gold-text uppercase tracking-wider"><i class="fa-solid fa-pen-to-square"></i> Registrar Novo Encontro Real</h3>
+
+          <form id="fieldReportForm" onsubmit="saveFieldReport(event)" class="space-y-3">
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-[11px] text-gray-400">Nome/Apelido Match</label>
+                <input type="text" id="repName" required placeholder="Ex: Valentina" class="w-full mt-1 bg-dark-900 border border-gray-700 rounded-lg p-2 text-xs text-gray-200">
+              </div>
+              <div>
+                <label class="text-[11px] text-gray-400">Nota da Persona</label>
+                <select id="repRating" class="w-full mt-1 bg-dark-900 border border-gray-700 rounded-lg p-2 text-xs text-gray-200">
+                  <option value="7.0">7.0/10 (Nível 1)</option>
+                  <option value="8.5" selected>8.5/10 (Nível 2)</option>
+                  <option value="9.5">9.5/10 (Nível 3)</option>
+                  <option value="10.0">10.0/10 (High-Value)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-[11px] text-gray-400">Local do Encontro</label>
+                <input type="text" id="repLocation" required placeholder="Ex: Bar de Drinks" class="w-full mt-1 bg-dark-900 border border-gray-700 rounded-lg p-2 text-xs text-gray-200">
+              </div>
+              <div>
+                <label class="text-[11px] text-gray-400">Resultado Final</label>
+                <select id="repOutcome" class="w-full mt-1 bg-dark-900 border border-gray-700 rounded-lg p-2 text-xs text-gray-200">
+                  <option value="sucesso">Sucesso / Conexão Completa</option>
+                  <option value="seguimento">Bom Encontro / Reagendado</option>
+                  <option value="frio">Esfriou / Perda de Frame</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-[11px] text-gray-400">Notas de Aprendizado (O que funcionou & o que errou)</label>
+              <textarea id="repNotes" rows="2" placeholder="Ex: O sequestro no início do bar funcionou perfeitamente, mas hesitei na transição..." class="w-full mt-1 bg-dark-900 border border-gray-700 rounded-lg p-2 text-xs text-gray-200 focus:outline-none focus:border-gold-500"></textarea>
+            </div>
+
+            <button type="submit" class="w-full py-2 rounded-xl gold-gradient text-dark-900 font-bold text-xs">
+              <i class="fa-solid fa-floppy-disk"></i> Salvar Relatório de Campo
+            </button>
+          </form>
+        </div>
+
+        <!-- Analytics Visual / Gráficos -->
+        <div class="glass-card p-4 rounded-2xl border border-gold-500/20 flex flex-col justify-between space-y-3">
+          <h3 class="font-bold text-xs gold-text uppercase tracking-wider"><i class="fa-solid fa-chart-pie"></i> Desempenho por Escalão de Nota</h3>
+          
+          <div class="flex-1 flex items-center justify-center p-2 min-h-[180px]">
+            <canvas id="reportsChart"></canvas>
+          </div>
+
+          <div id="aiPatternAnalysis" class="bg-dark-900 p-3 rounded-xl border border-gray-800 text-[11px] text-gray-300">
+            <span class="font-bold text-gold-400 block mb-0.5"><i class="fa-solid fa-microchip"></i> Diagnóstico de Padrões Pessoais:</span>
+            <p id="patternDiagnosisText">Registre pelo menos 2 encontros para ativar a análise inteligente de comportamento.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTÓRICO DE FIELD REPORTS -->
+      <div class="glass-card p-4 rounded-2xl border border-gold-500/20 space-y-3">
+        <h3 class="font-bold text-xs text-gray-200"><i class="fa-solid fa-clock-rotate-left text-gold-400"></i> Histórico de Relatórios Salvos</h3>
+        <div id="reportsList" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+          <!-- Injetado via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ABA 5: ESTRATÉGIA & SEQUESTRO DE ATENÇÃO (EXPANDIDO) -->
+    <section id="tab-strategy" class="hidden space-y-4 max-w-4xl mx-auto">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-200 flex items-center gap-2">
+          <i class="fa-solid fa-bolt text-gold-500"></i> Sequestro de Atenção (12 Scripts Táticos)
+        </h2>
+        <span class="text-xs px-2.5 py-1 rounded-full bg-gold-500/10 text-gold-400 border border-gold-500/20">Pattern Interrupt</span>
+      </div>
+
+      <div class="glass-card rounded-2xl p-4 border border-gold-500/20 space-y-4">
+        <p class="text-xs text-gray-300">Gatilhos mentais fundamentados nos autores para romper o processamento automático da mulher e prender a atenção no primeiro segundo.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="strategyScriptsContainer">
+          <!-- Injetado via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ABA 6: AUTORES & AUTORIDADES (TODOS OS 9 AUTORES) -->
+    <section id="tab-authors" class="hidden space-y-4 max-w-4xl mx-auto">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-200 flex items-center gap-2">
+          <i class="fa-solid fa-book-bookmark text-gold-500"></i> Biblioteca de Autores & Fundamentos (9 Teóricos)
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="authorsContainer">
+        <!-- Injetado via JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- NAVIGATION BAR (FOOTER BAR - FIXADA PARA DISPOSITIVOS MÓVEIS) -->
+  <nav class="fixed bottom-0 left-0 right-0 glass-card px-2 py-2 border-t border-gold-600/20 z-50 pb-safe">
+    <div class="max-w-md mx-auto flex items-center justify-around text-center">
+      <button onclick="switchTab('simulator')" id="nav-simulator" class="nav-btn flex flex-col items-center text-gold-400 text-[10px] font-medium">
+        <i class="fa-solid fa-comments text-base mb-0.5"></i> Chat
+      </button>
+
+      <button onclick="switchTab('vision')" id="nav-vision" class="nav-btn flex flex-col items-center text-gray-400 hover:text-gold-400 text-[10px] font-medium">
+        <i class="fa-solid fa-eye text-base mb-0.5"></i> Vision
+      </button>
+
+      <button onclick="switchTab('field')" id="nav-field" class="nav-btn flex flex-col items-center text-gray-400 hover:text-gold-400 text-[10px] font-medium">
+        <i class="fa-solid fa-glass-water text-base mb-0.5"></i> Encontro
+      </button>
+
+      <button onclick="switchTab('reports')" id="nav-reports" class="nav-btn flex flex-col items-center text-gray-400 hover:text-gold-400 text-[10px] font-medium">
+        <i class="fa-solid fa-chart-line text-base mb-0.5"></i> Diário
+      </button>
+
+      <button onclick="switchTab('strategy')" id="nav-strategy" class="nav-btn flex flex-col items-center text-gray-400 hover:text-gold-400 text-[10px] font-medium">
+        <i class="fa-solid fa-bolt text-base mb-0.5"></i> Scripts
+      </button>
+
+      <button onclick="switchTab('authors')" id="nav-authors" class="nav-btn flex flex-col items-center text-gray-400 hover:text-gold-400 text-[10px] font-medium">
+        <i class="fa-solid fa-book text-base mb-0.5"></i> Autores
+      </button>
+    </div>
+  </nav>
+
+  <!-- MODAL: GEMINI API KEY -->
+  <div id="apiModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="glass-card max-w-sm w-full rounded-2xl p-5 border border-gold-500/30 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-sm gold-text flex items-center gap-2"><i class="fa-solid fa-key"></i> Chave Gemini API</h3>
+        <button onclick="closeApiModal()" class="text-gray-400 text-sm"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p class="text-xs text-gray-300">Insira sua chave gratuita da Google Gemini API para ativar respostas ilimitadas por IA em tempo real.</p>
+      <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="w-full bg-dark-900 border border-gray-700 rounded-xl p-2.5 text-xs text-gray-100 focus:outline-none focus:border-gold-500">
+      <div class="flex space-x-2">
+        <button onclick="saveApiKey()" class="flex-1 py-2 rounded-xl gold-gradient text-dark-900 font-bold text-xs">Salvar Chave</button>
+        <button onclick="clearApiKey()" class="px-3 py-2 rounded-xl bg-dark-700 text-gray-300 text-xs">Remover</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: GALERIA DE FOTOS -->
+  <div id="galleryModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div class="glass-card max-w-md w-full rounded-2xl p-4 border border-gold-500/30 space-y-3">
+      <div class="flex items-center justify-between">
+        <h3 id="galleryTitle" class="font-bold text-sm text-gray-100">Fotos do Perfil</h3>
+        <button onclick="closeGalleryModal()" class="text-gray-400 text-sm"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="galleryGrid" class="grid grid-cols-2 gap-2 max-h-80 overflow-y-auto">
+        <!-- Injetado via JS -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // DATA APP STATE
+    const state = {
+      activeTab: 'simulator',
+      geminiApiKey: localStorage.getItem('eros_gemini_key') || '',
+      audioEnabled: true,
+      currentPersonaIndex: 0,
+      attraction: 50,
+      visionImageBase64: null,
+      personas: [
+        {
+          name: 'Sofia', rating: '7.0', level: 'e1', archetype: 'Receptiva & Direta',
+          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+          photos: ['https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80'],
+          prompt: 'Sofia, 7.0/10, receptiva, sem jogos mentais.',
+          greeting: 'Oi! Gostei da sua foto na praia. Você vai para lá direto?'
+        },
+        {
+          name: 'Beatriz', rating: '7.5', level: 'e1', archetype: 'Comunicativa & Leve',
+          avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80',
+          photos: ['https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80'],
+          prompt: 'Beatriz, 7.5/10, gosta de papo fluido.',
+          greeting: 'Hey! Espero que você tenha algo mais interessante do que um "oi tudo bem" haha.'
+        },
+        {
+          name: 'Sienna', rating: '8.0', level: 'e2', archetype: 'Culta & Exigente',
+          avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=300&q=80',
+          photos: ['https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80'],
+          prompt: 'Sienna, 8.0/10, odeia tom de entrevista.',
+          greeting: 'Me convença em uma frase de que você não é mais um clichê de aplicativo.'
+        },
+        {
+          name: 'Larissa', rating: '8.5', level: 'e2', archetype: 'Inflacionada & Festiva',
+          avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=300&q=80',
+          photos: ['https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=600&q=80'],
+          prompt: 'Larissa, 8.5/10, acostumada com bajulação.',
+          greeting: 'Minhas notificações não param. O que você tem de diferente?'
+        },
+        {
+          name: 'Isabella', rating: '9.0', level: 'e3', archetype: 'Misteriosa & Shit-Tester',
+          avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80',
+          photos: ['https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80'],
+          prompt: 'Isabella, 9.0/10, sarcástica e highly defensive.',
+          greeting: 'Você parece o tipo de cara que ensaia as frases antes de mandar. Acertei?'
+        },
+        {
+          name: 'Valentina', rating: '9.5', level: 'e3', archetype: 'Aventureira & Impositiva',
+          avatar: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=300&q=80',
+          photos: ['https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=600&q=80'],
+          prompt: 'Valentina, 9.5/10, confiante e desafiadora.',
+          greeting: 'Não tenho paciência para conversas mornas. Qual é o seu risco mais recente?'
+        },
+        {
+          name: 'Giselle', rating: '10.0', level: 'e3', archetype: 'Socialite & Ultra High-Value',
+          avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=300&q=80',
+          photos: ['https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=600&q=80'],
+          prompt: 'Giselle, 10.0/10, padrão altíssimo de exigência.',
+          greeting: 'Dificilmente respondo aqui. Escreva algo que realmente valha meu tempo.'
+        }
+      ],
+      chatLogs: {},
+      fieldReports: JSON.parse(localStorage.getItem('eros_field_reports') || '[]'),
+      
+      // TODOS OS 9 AUTORES
+      authors: [
+        { name: 'Robert Greene', book: 'A Arte da Sedução / 48 Leis do Poder', area: 'Estratégia & Arquétipos', desc: 'Sedução Fria, criação de mistério, manipulação de ausência e alternância de atenção para inflacionar o valor percebido.' },
+        { name: 'Oren Klaff', book: 'Pitch Anything', area: 'Controle de Frame & Foco', desc: 'Dominância de enquadramento, Sequestro de Atenção (Pattern Interrupt) e erradicação total do tom de busca por aprovação (Seeker Frame).' },
+        { name: 'Geoffrey Miller', book: 'The Mating Mind / Mating Intelligence', area: 'Psicologia Evolutiva', desc: 'Sinalização de fitness mental/social e como a inteligência, perspicácia e o humor agem como indicadores diretos de genoma adaptativo.' },
+        { name: 'Robert Cialdini', book: 'As Armas da Persuasão / Pré-suasão', area: 'Gatilhos de Influência', desc: 'Princípios de Escassez, Prova Social, Contraste e Reciprocidade aplicados ao posicionamento inicial da conversa.' },
+        { name: 'Neil Strauss', book: 'O Jogo (The Game)', area: 'Engenharia de Aberturas', desc: 'Aberturas indiretas, quebra de padrão, desvalidação sutil e neutralização da defensiva em perfis altamente disputados.' },
+        { name: 'Mystery (Erik von Markovik)', book: 'The Mystery Method', area: 'Dinâmica de Atração & PUA', desc: 'Mecânicas de Push-Pull, provocação leve (Negging calibrado) e enquadramento defensivo diante de Shit Tests.' },
+        { name: 'Ian Rowland', book: 'Full Facts Book of Cold Reading', area: 'Leitura Fria & Observação', desc: 'Construção de frases de alto impacto (Efeito Barnum) baseadas em detalhes visuais mínimos do perfil ou fotos do Match.' },
+        { name: 'Bandler & Grinder', book: 'Fundamentos da PNL', area: 'Ancoragem & Condução', desc: 'Ancoragem emocional, calibragem de ritmo de resposta e acompanhamento e condução (Pacing & Leading).' },
+        { name: 'Daniel Kahneman', book: 'Rápido e Devagar', area: 'Psicologia Comportamental', desc: 'Interrupção do Sistema 1 (processamento automático e desinteressado) para forçar o Sistema 2 (engajamento analítico e foco).' }
+      ],
+
+      // 12 SCRIPTS TÁTICOS EXPANDIDOS E BASEADOS NOS AUTORES
+      strategyScripts: [
+        { title: 'Inversão de Papel (Role Reversal)', author: 'Oren Klaff / Neil Strauss', script: 'Tenho uma péssima notícia sobre o seu perfil...' },
+        { title: 'Cold Reading de Personalidade', author: 'Ian Rowland', script: 'Sua terceira foto tem exatamente a energia de quem atrai confusão e finge que não tem nada a ver com isso.' },
+        { title: 'Quebra de Padrão Estético', author: 'Mystery / Strauss', script: 'Prometo não fazer nenhuma pergunta sobre a sua beleza se você prometer não responder com "haha sim".' },
+        { title: 'Ativação do Sistema 2 (Curiosidade)', author: 'Daniel Kahneman', script: 'Notei um detalhe muito específico no seu perfil que revela mais sobre você do que a sua bio inteira.' },
+        { title: 'Desvalidação Leve (Negging Calibrado)', author: 'Robert Greene / Mystery', script: 'Você tem toda a cara de quem parece super simpática nas fotos, mas é insuportável nos primeiros 10 minutos de conversa.' },
+        { title: 'Sinalização de Fitness Mental', author: 'Geoffrey Miller', script: 'Aposto um drink que você gasta mais tempo escolhendo o que vai comer no restaurante do que escolhendo com quem vai sair.' },
+        { title: 'Sequestro de Atenção Direto', author: 'Oren Klaff', script: 'Cancelando o meu "oi tudo bem" automático para perguntar algo útil: qual foi o maior impulso que você cometeu este mês?' },
+        { title: 'Gatilho do Contraste / Escassez', author: 'Robert Cialdini', script: 'Dificilmente dou o primeiro passo aqui, mas a sua segunda foto pareceu um desafio direto.' },
+        { title: 'Leitura Fria de Ambiente', author: 'Ian Rowland', script: 'Pelo estilo desse lugar na sua foto, você é do tipo que prefere um bar com pouca luz e bom som do que uma balada lotada. Errei?' },
+        { title: 'Controle de Frame Absoluto', author: 'Oren Klaff', script: 'Se a gente não concordar sobre qual é a melhor comida de madrugada, vou ser obrigado a desfazer o match.' },
+        { title: 'Ancoragem de Tensão Divertida', author: 'Bandler & Grinder (PNL)', script: 'Sua expressão nessa foto passa uma vibração perigosa de quem convence qualquer um a fazer bobagem.' },
+        { title: 'Desafio de Valor Percebido', author: 'Robert Greene', script: 'Gostei do seu perfil, mas preciso saber: você é mais divertida no chat ou ao vivo em um drink?' }
+      ]
+    };
+
+    let chartInstance = null;
+
+    // INIT APP
+    window.addEventListener('DOMContentLoaded', () => {
+      renderPersonasCards('all');
+      selectPersona(0);
+      renderAuthors();
+      renderStrategyScripts();
+      renderFieldReports();
+      initChart();
+      updateAiBadge();
+    });
+
+    // NAVIGATION
+    function switchTab(tabId) {
+      document.querySelectorAll('main > section').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+      
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('text-gold-400');
+        btn.classList.add('text-gray-400');
+      });
+      document.getElementById(`nav-${tabId}`).classList.add('text-gold-400');
+      state.activeTab = tabId;
+    }
+
+    // PERSONAS RENDER
+    function filterPersonas(level) {
+      renderPersonasCards(level);
+    }
+
+    function renderPersonasCards(level) {
+      const container = document.getElementById('personaCardsContainer');
+      container.innerHTML = '';
+      state.personas.forEach((p, idx) => {
+        if (level !== 'all' && p.level !== level) return;
+        const card = document.createElement('div');
+        card.className = `glass-card p-2 rounded-xl cursor-pointer transition border hover:border-gold-500/50 flex items-center space-x-2 ${state.currentPersonaIndex === idx ? 'border-gold-500 bg-gold-500/10' : ''}`;
+        card.onclick = () => selectPersona(idx);
+        card.innerHTML = `
+          <img src="${p.avatar}" class="w-10 h-10 rounded-lg object-cover">
+          <div class="overflow-hidden">
+            <div class="flex items-center space-x-1">
+              <span class="font-bold text-xs text-gray-200 truncate">${p.name}</span>
+              <span class="text-[9px] px-1 rounded bg-gold-500/20 text-gold-400 font-bold">${p.rating}</span>
+            </div>
+            <span class="text-[10px] text-gray-400 truncate block">${p.archetype}</span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function selectPersona(idx) {
+      state.currentPersonaIndex = idx;
+      const p = state.personas[idx];
+      document.getElementById('activePersonaAvatar').src = p.avatar;
+      document.getElementById('activePersonaName').innerText = p.name;
+      document.getElementById('activePersonaRating').innerText = `${p.rating}/10`;
+      document.getElementById('activePersonaArchetype').innerText = p.archetype;
+      
+      if (!state.chatLogs[p.name]) {
+        state.chatLogs[p.name] = [{ sender: 'persona', text: p.greeting }];
+      }
+      renderChatMessages();
+      renderPersonasCards('all');
+    }
+
+    function renderChatMessages() {
+      const p = state.personas[state.currentPersonaIndex];
+      const container = document.getElementById('chatMessages');
+      container.innerHTML = '';
+      const logs = state.chatLogs[p.name] || [];
+      
+      logs.forEach(msg => {
+        const div = document.createElement('div');
+        div.className = `flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`;
+        div.innerHTML = `
+          <div class="max-w-[80%] rounded-2xl px-3.5 py-2 text-xs ${msg.sender === 'user' ? 'gold-gradient text-dark-900 font-medium rounded-br-none' : 'bg-dark-800 text-gray-200 border border-gray-700 rounded-bl-none'} flex items-center justify-between gap-2">
+            <span>${msg.text}</span>
+            ${msg.sender === 'persona' ? `<button onclick="speakText('${msg.text}')" class="text-gray-400 hover:text-gold-400 text-[10px]"><i class="fa-solid fa-volume-high"></i></button>` : ''}
+          </div>
+        `;
+        container.appendChild(div);
+      });
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function sendChatMessage() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const p = state.personas[state.currentPersonaIndex];
+      state.chatLogs[p.name].push({ sender: 'user', text: text });
+      input.value = '';
+      renderChatMessages();
+
+      // Trigger Advisor & Answer
+      processAdvisorFeedback(text, p);
+      setTimeout(() => generatePersonaReply(text, p), 800);
+    }
+
+    function handleChatKeyPress(e) {
+      if (e.key === 'Enter') sendChatMessage();
+    }
+
+    function processAdvisorFeedback(text, p) {
+      const score = Math.min(10, Math.max(3, (text.length > 20 ? 8 : 5) + (parseFloat(p.rating) > 8.5 ? -1 : 1)));
+      document.getElementById('advisorBanner').classList.remove('hidden');
+      document.getElementById('advisorScore').innerText = `Score: ${score.toFixed(1)}/10`;
+      document.getElementById('advisorText').innerText = score > 7 ? 'Abordagem forte! Bom enquadramento e sem busca por validação.' : 'Tom de entrevista detectado. Use um Sequestro de Atenção.';
+      
+      state.attraction = Math.min(100, Math.max(10, state.attraction + (score > 7 ? 10 : -10)));
+      document.getElementById('attractionBar').style.width = `${state.attraction}%`;
+    }
+
+    async function generatePersonaReply(userText, p) {
+      if (state.geminiApiKey) {
+        try {
+          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${state.geminiApiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{
+                parts: [{
+                  text: `Você é a persona de Tinder ${p.name}, nota de beleza percebida ${p.rating}/10, arquétipo "${p.archetype}". Instruções: ${p.prompt}. Responda à seguinte mensagem do homem mantendo a personalidade de forma curta (máximo 2 frases): "${userText}"`
+                }]
+              }]
+            })
+          });
+          const data = await response.json();
+          if (data.candidates && data.candidates[0].content.parts[0].text) {
+            const reply = data.candidates[0].content.parts[0].text;
+            state.chatLogs[p.name].push({ sender: 'persona', text: reply });
+            renderChatMessages();
+            if (state.audioEnabled) speakText(reply);
+            return;
+          }
+        } catch (e) {
+          console.error("Erro no Gemini Chat API, recorrendo ao modo local:", e);
+        }
+      }
+
+      let reply = "Interessante... mas você sempre é tão direto assim?";
+      if (parseFloat(p.rating) >= 9.5) reply = "Gostei da audácia, mas ainda não me convenceu.";
+      
+      state.chatLogs[p.name].push({ sender: 'persona', text: reply });
+      renderChatMessages();
+      if (state.audioEnabled) speakText(reply);
+    }
+
+    // EROS VISION AI - UPLOAD E ANÁLISE MULTIMODAL
+    function handleVisionImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          state.visionImageBase64 = evt.target.result;
+          const imgPreview = document.getElementById('visionPreview');
+          imgPreview.src = state.visionImageBase64;
+          imgPreview.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function analyzeVisionPrint() {
+      const apiKey = localStorage.getItem('eros_gemini_key') || state.geminiApiKey;
+      const rating = document.getElementById('visionRating').value;
+      const textInput = document.getElementById('visionTextInput').value.trim();
+      const btn = document.getElementById('btnAnalisarVision');
+      const resultArea = document.getElementById('visionResult');
+      const diagnosisText = document.getElementById('visionDiagnosisText');
+
+      if (!apiKey) {
+        alert('Por favor, insira a sua chave da Gemini API no topo (ícone da chave amarela)!');
+        return;
+      }
+
+      if (!state.visionImageBase64 && !textInput) {
+        alert('Por favor, envie o print da conversa ou cole o texto para análise.');
+        return;
+      }
+
+      btn.innerText = '🔄 Processando Análise de Frame...';
+      btn.disabled = true;
+
+      try {
+        const parts = [];
+
+        if (state.visionImageBase64) {
+          const base64Data = state.visionImageBase64.split(',')[1];
+          const mimeType = state.visionImageBase64.split(';')[0].split(':')[1] || 'image/png';
+          parts.push({
+            inline_data: {
+              mime_type: mimeType,
+              data: base64Data
+            }
+          });
+        }
+
+        const promptText = `Atue como o motor EROS VISION, especialista em dinâmica de atração, sedução e psicologia de enquadramento.
+Analise este print/conversa com base no nível do match informado: ${rating}/10.
+Texto adicional da conversa: "${textInput}".
+
+Retorne a análise ESTRITAMENTE em formato JSON puro, sem marcações markdown adicionais, com o seguinte esquema:
+{
+  "diagnostico": "Explicação detalhada sobre quem está no controle do frame, subtexto e erros commetidos.",
+  "opcaoA": "Resposta no estilo Sequestro de Atenção (Pattern Interrupt)",
+  "opcaoB": "Resposta no estilo Push-Pull / Provocação Calibrada",
+  "opcaoC": "Resposta no estilo Fechamento / Chamada para o Encontro"
+}`;
+
+        parts.push({ text: promptText });
+
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: parts }]
+          })
+        });
+
+        const data = await response.json();
+        
+        if (data.error) throw new Error(data.error.message);
+
+        const rawText = data.candidates[0].content.parts[0].text;
+        let parsed;
+        try {
+          const cleanJson = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+          parsed = JSON.parse(cleanJson);
+        } catch(e) {
+          parsed = {
+            diagnostico: rawText,
+            opcaoA: "Tenho uma péssima notícia sobre o seu perfil...",
+            opcaoB: "Você parece simpática, mas tem cara de quem causa problemas.",
+            opcaoC: "Qual é o seu drink favorito para quando nos encontrarmos esta semana?"
+          };
+        }
+
+        diagnosisText.innerHTML = parsed.diagnostico.replace(/\n/g, '<br>');
+        document.getElementById('optAText').innerText = parsed.opcaoA;
+        document.getElementById('optBText').innerText = parsed.opcaoB;
+        document.getElementById('optCText').innerText = parsed.opcaoC;
+
+        resultArea.classList.remove('hidden');
+
+      } catch (err) {
+        alert('Erro na análise: ' + err.message);
+        console.error(err);
+      } finally {
+        btn.innerText = '⚡ Analisar Print e Gerar Respostas';
+        btn.disabled = false;
+      }
+    }
+
+    function copyText(elementId) {
+      const txt = document.getElementById(elementId).innerText;
+      if (txt && txt !== '---') {
+        navigator.clipboard.writeText(txt);
+        alert('Resposta copiada para a área de transferência!');
+      }
+    }
+
+    // SPEECH SYNTHESIS & VOICE INPUT
+    function speakText(text) {
+      if ('speechSynthesis' in window) {
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'pt-BR';
+        window.speechSynthesis.speak(utter);
+      }
+    }
+
+    function startVoiceInput() {
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const rec = new SpeechRec();
+        rec.lang = 'pt-BR';
+        rec.onresult = (e) => {
+          document.getElementById('chatInput').value = e.results[0][0].transcript;
+        };
+        rec.start();
+      } else {
+        alert('Reconhecimento de voz não suportado neste navegador.');
+      }
+    }
+
+    // FIELD REPORTS & ANALYTICS
+    function saveFieldReport(e) {
+      e.preventDefault();
+      const report = {
+        id: Date.now(),
+        name: document.getElementById('repName').value,
+        rating: document.getElementById('repRating').value,
+        location: document.getElementById('repLocation').value,
+        outcome: document.getElementById('repOutcome').value,
+        notes: document.getElementById('repNotes').value,
+        date: new Date().toLocaleDateString('pt-BR')
+      };
+
+      state.fieldReports.unshift(report);
+      localStorage.setItem('eros_field_reports', JSON.stringify(state.fieldReports));
+      document.getElementById('fieldReportForm').reset();
+      renderFieldReports();
+      updateDashboardStats();
+    }
+
+    function renderFieldReports() {
+      const container = document.getElementById('reportsList');
+      container.innerHTML = '';
+      
+      if (state.fieldReports.length === 0) {
+        container.innerHTML = '<p class="text-xs text-gray-500">Nenhum relatório de encontro registrado ainda.</p>';
+        return;
+      }
+
+      state.fieldReports.forEach(rep => {
+        const div = document.createElement('div');
+        div.className = 'bg-dark-900 p-3 rounded-xl border border-gray-800 text-xs flex flex-col space-y-1';
+        div.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-gray-200">${rep.name} (${rep.rating}/10)</span>
+            <span class="text-[10px] px-2 py-0.5 rounded ${rep.outcome === 'sucesso' ? 'bg-green-500/20 text-green-400' : 'bg-gold-500/20 text-gold-400'}">${rep.outcome.toUpperCase()}</span>
+          </div>
+          <p class="text-gray-400 text-[11px]"><i class="fa-solid fa-location-dot"></i> ${rep.location} • ${rep.date}</p>
+          <p class="text-gray-300 italic text-[11px]">"${rep.notes}"</p>
+        `;
+        container.appendChild(div);
+      });
+      updateDashboardStats();
+    }
+
+    function updateDashboardStats() {
+      const total = state.fieldReports.length;
+      document.getElementById('statTotalDates').innerText = total;
+
+      if (total > 0) {
+        const success = state.fieldReports.filter(r => r.outcome === 'sucesso').length;
+        const rate = Math.round((success / total) * 100);
+        document.getElementById('statConversionRate').innerText = `${rate}%`;
+
+        const avg = (state.fieldReports.reduce((acc, r) => acc + parseFloat(r.rating), 0) / total).toFixed(1);
+        document.getElementById('statAvgScore').innerText = `${avg}`;
+
+        document.getElementById('patternDiagnosisText').innerText = `Padrão Detectado: Excelente taxa de conversão em locais como bars/lounges. Mantenha o enquadramento inicial.`;
+      }
+      updateChartData();
+    }
+
+    function initChart() {
+      const ctx = document.getElementById('reportsChart').getContext('2d');
+      chartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Nível 1 (6-7.5)', 'Nível 2 (8-8.5)', 'Nível 3 (9-10)'],
+          datasets: [{
+            data: [1, 1, 1],
+            backgroundColor: ['#ca8a04', '#eab308', '#facc15'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#9ca3af', font: { size: 10 } } } }
+        }
+      });
+    }
+
+    function updateChartData() {
+      if (!chartInstance) return;
+      const n1 = state.fieldReports.filter(r => parseFloat(r.rating) <= 7.5).length || 1;
+      const n2 = state.fieldReports.filter(r => parseFloat(r.rating) > 7.5 && parseFloat(r.rating) <= 8.5).length || 1;
+      const n3 = state.fieldReports.filter(r => parseFloat(r.rating) > 8.5).length || 1;
+
+      chartInstance.data.datasets[0].data = [n1, n2, n3];
+      chartInstance.update();
+    }
+
+    // RENDERIZAR TODOS OS 9 AUTORES
+    function renderAuthors() {
+      const container = document.getElementById('authorsContainer');
+      container.innerHTML = '';
+      state.authors.forEach(a => {
+        const div = document.createElement('div');
+        div.className = 'glass-card p-4 rounded-xl border border-gold-500/20 space-y-1';
+        div.innerHTML = `
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-xs text-gold-400">${a.name}</h4>
+            <span class="text-[9px] px-2 py-0.5 rounded bg-gold-500/10 text-gold-400 border border-gold-500/20">${a.area}</span>
+          </div>
+          <span class="text-[10px] text-gray-400 font-semibold block">${a.book}</span>
+          <p class="text-xs text-gray-300 mt-1 leading-relaxed">${a.desc}</p>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // RENDERIZAR OS 12 SCRIPTS DE SEQUESTRO
+    function renderStrategyScripts() {
+      const container = document.getElementById('strategyScriptsContainer');
+      container.innerHTML = '';
+      state.strategyScripts.forEach(s => {
+        const div = document.createElement('div');
+        div.className = 'bg-dark-900 p-3.5 rounded-xl border border-gray-800 space-y-2 flex flex-col justify-between';
+        div.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs font-bold text-gold-400">${s.title}</span>
+              <span class="text-[9px] text-gray-400 border border-gray-700 px-1.5 py-0.5 rounded">${s.author}</span>
+            </div>
+            <p class="text-xs text-gray-200 italic">"${s.script}"</p>
+          </div>
+          <div class="flex space-x-2 pt-1">
+            <button onclick="copyScriptText('${s.script}')" class="flex-1 py-1 rounded bg-dark-700 text-xs text-gray-300 hover:text-gold-400 border border-gray-700"><i class="fa-regular fa-copy"></i> Copiar</button>
+            <button onclick="useScriptInChat('${s.script}')" class="flex-1 py-1 rounded gold-gradient text-dark-900 font-bold text-xs"><i class="fa-solid fa-paper-plane"></i> Usar no Chat</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function injectHookScript() {
+      document.getElementById('chatInput').value = "Tenho uma péssima notícia sobre o seu perfil...";
+    }
+
+    function copyCurrentInput() {
+      const val = document.getElementById('chatInput').value;
+      if (val) copyScriptText(val);
+    }
+
+    function copyScriptText(txt) {
+      navigator.clipboard.writeText(txt);
+      alert('Texto copiado para a área de transferência!');
+    }
+
+    function useScriptInChat(txt) {
+      switchTab('simulator');
+      document.getElementById('chatInput').value = txt;
+    }
+
+    function toggleAudioSetting() {
+      state.audioEnabled = !state.audioEnabled;
+      document.getElementById('audioIcon').className = state.audioEnabled ? 'fa-solid fa-volume-high text-gold-400' : 'fa-solid fa-volume-xmark text-gray-500';
+    }
+
+    function openApiModal() { document.getElementById('apiModal').classList.remove('hidden'); }
+    function closeApiModal() { document.getElementById('apiModal').classList.add('hidden'); }
+    function saveApiKey() {
+      const k = document.getElementById('apiKeyInput').value.trim();
+      if (k) {
+        state.geminiApiKey = k;
+        localStorage.setItem('eros_gemini_key', k);
+        updateAiBadge();
+        closeApiModal();
+      }
+    }
+    function clearApiKey() {
+      localStorage.removeItem('eros_gemini_key');
+      state.geminiApiKey = '';
+      updateAiBadge();
+      closeApiModal();
+    }
+    function updateAiBadge() {
+      const b = document.getElementById('aiModeBadge');
+      if (state.geminiApiKey) {
+        b.innerText = 'Modo: Gemini AI';
+        b.className = 'text-xs px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30';
+      } else {
+        b.innerText = 'Modo: Local';
+        b.className = 'text-xs px-2.5 py-1 rounded-full bg-gold-500/10 text-gold-400 border border-gold-500/20';
+      }
+    }
+
+    function openGalleryModal() {
+      const p = state.personas[state.currentPersonaIndex];
+      document.getElementById('galleryTitle').innerText = `Fotos de ${p.name}`;
+      const grid = document.getElementById('galleryGrid');
+      grid.innerHTML = p.photos.map(ph => `<img src="${ph}" class="w-full h-36 object-cover rounded-xl border border-gray-800">`).join('');
+      document.getElementById('galleryModal').classList.remove('hidden');
+    }
+    function closeGalleryModal() { document.getElementById('galleryModal').classList.add('hidden'); }
+
+    // FIELD SCENARIO SIMULATOR COMPLETO
+    function loadFieldScenario(type, evt) {
+      const cardTitle = document.getElementById('scenarioTitle');
+      const cardDesc = document.getElementById('scenarioDescription');
+      const container = document.getElementById('scenarioChoices');
+      
+      document.querySelectorAll('#tab-field .flex.space-x-2 button').forEach(btn => {
+        btn.className = "px-3 py-1.5 rounded-lg bg-dark-700 text-gray-300 border border-gray-800";
+      });
+      
+      if (evt && evt.target) evt.target.className = "px-3 py-1.5 rounded-lg bg-gold-500 text-dark-900 font-bold";
+
+      if (type === 'drinks') {
+        cardTitle.innerText = "Bar de Drinks (15 min iniciais)";
+        cardDesc.innerText = "Ela chega, senta ao seu lado e olha o cardápio sem dizer muito. Como quebrar o gelo sem soar como entrevista?";
+        container.innerHTML = `
+          <button onclick="answerScenario(1)" class="w-full text-left p-2 rounded-lg bg-dark-800 hover:bg-dark-700 text-xs text-gray-200 border border-gray-700">A. "Você vem sempre aqui? O que recomenda beber?"</button>
+          <button onclick="answerScenario(2)" class="w-full text-left p-2 rounded-lg bg-dark-800 hover:bg-dark-700 text-xs text-gray-200 border border-gray-700">B. "Pela sua cara, você tem cara de quem pede o drink mais doce da carta."</button>
+        `;
+      } else if (type === 'cafe') {
+        cardTitle.innerText = "Café / Passeio à Tarde";
+        cardDesc.innerText = "Vocês estão caminhando por uma praça após pegarem o café. A conversa teve uma pausa de 10 segundos. O que fazer?";
+        container.innerHTML = `
+          <button onclick="answerScenario(3)" class="w-full text-left p-2 rounded-lg bg-dark-800 hover:bg-dark-700 text-xs text-gray-200 border border-gray-700">A. Ficar nervoso e puxar um assunto aleatório sobre o tempo.</button>
+          <button onclick="answerScenario(2)" class="w-full text-left p-2 rounded-lg bg-dark-800 hover:bg-dark-700 text-xs text-gray-200 border border-gray-700">B. Manter o contato visual, sorrir levemente e deixar o silêncio confortável sem pressa.</button>
+        `;
+      } else if (type === 'dinner') {
+        cardTitle.innerText = "Jantar / Restaurante";
+        cardDesc.innerText = "O garçom traz a conta ao final do jantar. Como gerenciar este momento mantendo o enquadramento correto?";
+        container.innerHTML = `
+          <button onclick="answerScenario(2)" class="w-full text-left p-2 rounded-lg bg-dark-800 hover:bg-dark-700 text-xs text-gray-200 border border-gray-700">A. Pegar a conta naturalmente sem fazer disso um assunto ou drama de discussão.</button>
+          <button onclick="answerScenario(1)" class="w-full text-left p-2 rounded-lg bg-dark-800 hover:bg-dark-700 text-xs text-gray-200 border border-gray-700">B. Insistir repetidamente para dividir o valor exato no centavo.</button>
+        `;
+      }
+    }
+
+    function answerScenario(opt) {
+      if (opt === 2) {
+        alert('Excelente escolha! Demonstra controle de frame e confiança sem necessitar de validação.');
+      } else if (opt === 3) {
+        alert('Cuidado: Demonstrar ansiedade com o silêncio passa insegurança.');
+      } else {
+        alert('Atenção: Essa atitude demonstra hesitação ou tom de busca por aprovação.');
+      }
+    }
+  </script>
+</body>
+</html>
