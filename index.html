@@ -195,13 +195,13 @@
         <p class="text-xs text-gray-300">Carregue um print da conversa do Tinder, Instagram ou WhatsApp para obter uma análise fria do enquadramento e sugestões de resposta calibradas.</p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Upload Area Mobile-Optimized -->
+          <!-- Upload Area Totalmente Clicável para Mobile -->
           <div class="border-2 border-dashed border-gray-700 hover:border-gold-500/50 rounded-xl p-6 flex flex-col items-center justify-center text-center bg-dark-900/50 relative cursor-pointer min-h-[160px]">
-            <input type="file" id="visionFileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handleVisionImageUpload(event)">
-            <i class="fa-solid fa-cloud-arrow-up text-3xl text-gold-400 mb-2"></i>
-            <span class="text-xs text-gray-200 font-semibold">Clique para enviar o Print da Conversa</span>
-            <span class="text-[10px] text-gray-400 mt-1">Formatos: PNG, JPG, WEBP</span>
-            <img id="visionPreview" class="hidden mt-3 max-h-40 rounded-lg border border-gold-500/30 object-contain z-20">
+            <input type="file" id="visionFileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" onchange="handleVisionImageUpload(event)">
+            <i class="fa-solid fa-cloud-arrow-up text-3xl text-gold-400 mb-2 pointer-events-none"></i>
+            <span class="text-xs text-gray-200 font-semibold pointer-events-none">Clique ou toque para enviar o Print</span>
+            <span class="text-[10px] text-gray-400 mt-1 pointer-events-none">PNG, JPG, WEBP</span>
+            <img id="visionPreview" class="hidden mt-3 max-h-40 rounded-lg border border-gold-500/30 object-contain z-10 pointer-events-none">
           </div>
 
           <!-- Context & Controls -->
@@ -220,7 +220,7 @@
               <textarea id="visionTextInput" rows="3" placeholder="Cole as últimas mensagens aqui..." class="w-full mt-1 bg-dark-900 border border-gray-700 rounded-lg p-2 text-xs text-gray-200 focus:outline-none focus:border-gold-500"></textarea>
             </div>
 
-            <button id="btnAnalisarVision" onclick="analyzeVisionPrint()" class="w-full py-2.5 rounded-xl gold-gradient text-dark-900 font-bold text-xs flex items-center justify-center gap-2">
+            <button id="btnAnalisarVision" onclick="analyzeVisionPrint()" class="w-full py-2.5 rounded-xl gold-gradient text-dark-900 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer relative z-30">
               <i class="fa-solid fa-wand-magic-sparkles"></i> Analisar Print e Gerar Respostas
             </button>
           </div>
@@ -260,7 +260,7 @@
       </div>
     </section>
 
-    <!-- ABA 3: FIELD SIMULATOR (ENCONTRO REAL) -->
+    <!-- ABA 3: FIELD SIMULATOR -->
     <section id="tab-field" class="hidden space-y-4 max-w-4xl mx-auto">
       <div class="flex items-center justify-between">
         <h2 class="text-lg font-semibold text-gray-200 flex items-center gap-2">
@@ -270,7 +270,6 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <!-- Cenários de Encontro -->
         <div class="md:col-span-2 glass-card rounded-2xl p-4 border border-gold-500/20 space-y-3">
           <h3 class="font-bold text-xs gold-text uppercase tracking-wider">Simulação de Decisão Presencial</h3>
           
@@ -294,7 +293,6 @@
           </div>
         </div>
 
-        <!-- Kino Ladder & Escalação Física -->
         <div class="glass-card rounded-2xl p-4 border border-gold-500/20 space-y-3">
           <h3 class="font-bold text-xs gold-text uppercase tracking-wider"><i class="fa-solid fa-hand-holding-heart"></i> Kino Escalation Ladder</h3>
           <p class="text-[11px] text-gray-400">Guia tático do toque social ao nível de intimidade física no encontro.</p>
@@ -319,7 +317,7 @@
       </div>
     </section>
 
-    <!-- ABA 4: DIÁRIO DE CAMPO & ANALYTICS -->
+    <!-- ABA 4: DIÁRIO DE CAMPO -->
     <section id="tab-reports" class="hidden space-y-4 max-w-4xl mx-auto">
       <div class="flex items-center justify-between">
         <h2 class="text-lg font-semibold text-gray-200 flex items-center gap-2">
@@ -328,7 +326,6 @@
         <span class="text-xs px-2.5 py-1 rounded-full bg-gold-500/10 text-gold-400 border border-gold-500/30">Field Reports</span>
       </div>
 
-      <!-- DASHBOARD CARDS -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div class="glass-card p-3 rounded-xl border border-gold-500/20 text-center">
           <span class="text-[10px] text-gray-400 uppercase tracking-wider block">Total Encontros</span>
@@ -348,10 +345,7 @@
         </div>
       </div>
 
-      <!-- PAINEL PRINCIPAL: FORMULÁRIO DE REGISTRO E GRÁFICOS -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        
-        <!-- Formulário de Novo Field Report -->
         <div class="glass-card p-4 rounded-2xl border border-gold-500/20 space-y-3">
           <h3 class="font-bold text-xs gold-text uppercase tracking-wider"><i class="fa-solid fa-pen-to-square"></i> Registrar Novo Encontro Real</h3>
 
@@ -388,8 +382,8 @@
             </div>
 
             <div>
-              <label class="text-[11px] text-gray-400">Notas de Aprendizado (O que funcionou & o que errou)</label>
-              <textarea id="repNotes" rows="2" placeholder="Ex: O sequestro no início do bar funcionou perfeitamente, mas hesitei na transição..." class="w-full mt-1 bg-dark-900 border border-gray-700 rounded-lg p-2 text-xs text-gray-200 focus:outline-none focus:border-gold-500"></textarea>
+              <label class="text-[11px] text-gray-400">Notas de Aprendizado</label>
+              <textarea id="repNotes" rows="2" placeholder="Ex: O sequestro funcionou perfeitamente..." class="w-full mt-1 bg-dark-900 border border-gray-700 rounded-lg p-2 text-xs text-gray-200 focus:outline-none focus:border-gold-500"></textarea>
             </div>
 
             <button type="submit" class="w-full py-2 rounded-xl gold-gradient text-dark-900 font-bold text-xs">
@@ -398,9 +392,8 @@
           </form>
         </div>
 
-        <!-- Analytics Visual / Gráficos -->
         <div class="glass-card p-4 rounded-2xl border border-gold-500/20 flex flex-col justify-between space-y-3">
-          <h3 class="font-bold text-xs gold-text uppercase tracking-wider"><i class="fa-solid fa-chart-pie"></i> Desempenho por Escalão de Nota</h3>
+          <h3 class="font-bold text-xs gold-text uppercase tracking-wider"><i class="fa-solid fa-chart-pie"></i> Desempenho por Escalão</h3>
           
           <div class="flex-1 flex items-center justify-center p-2 min-h-[180px]">
             <canvas id="reportsChart"></canvas>
@@ -413,16 +406,13 @@
         </div>
       </div>
 
-      <!-- HISTÓRICO DE FIELD REPORTS -->
       <div class="glass-card p-4 rounded-2xl border border-gold-500/20 space-y-3">
         <h3 class="font-bold text-xs text-gray-200"><i class="fa-solid fa-clock-rotate-left text-gold-400"></i> Histórico de Relatórios Salvos</h3>
-        <div id="reportsList" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
-          <!-- Injetado via JS -->
-        </div>
+        <div id="reportsList" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar"></div>
       </div>
     </section>
 
-    <!-- ABA 5: ESTRATÉGIA & SEQUESTRO DE ATENÇÃO (EXPANDIDO) -->
+    <!-- ABA 5: SCRIPTS -->
     <section id="tab-strategy" class="hidden space-y-4 max-w-4xl mx-auto">
       <div class="flex items-center justify-between">
         <h2 class="text-lg font-semibold text-gray-200 flex items-center gap-2">
@@ -434,13 +424,11 @@
       <div class="glass-card rounded-2xl p-4 border border-gold-500/20 space-y-4">
         <p class="text-xs text-gray-300">Gatilhos mentais fundamentados nos autores para romper o processamento automático da mulher e prender a atenção no primeiro segundo.</p>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="strategyScriptsContainer">
-          <!-- Injetado via JS -->
-        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="strategyScriptsContainer"></div>
       </div>
     </section>
 
-    <!-- ABA 6: AUTORES & AUTORIDADES (TODOS OS 9 AUTORES) -->
+    <!-- ABA 6: AUTORES -->
     <section id="tab-authors" class="hidden space-y-4 max-w-4xl mx-auto">
       <div class="flex items-center justify-between">
         <h2 class="text-lg font-semibold text-gray-200 flex items-center gap-2">
@@ -448,14 +436,12 @@
         </h2>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="authorsContainer">
-        <!-- Injetado via JS -->
-      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="authorsContainer"></div>
     </section>
 
   </main>
 
-  <!-- NAVIGATION BAR (FOOTER BAR - FIXADA PARA DISPOSITIVOS MÓVEIS) -->
+  <!-- NAVIGATION BAR (FOOTER BAR) -->
   <nav class="fixed bottom-0 left-0 right-0 glass-card px-2 py-2 border-t border-gold-600/20 z-50 pb-safe">
     <div class="max-w-md mx-auto flex items-center justify-around text-center">
       <button onclick="switchTab('simulator')" id="nav-simulator" class="nav-btn flex flex-col items-center text-gold-400 text-[10px] font-medium">
@@ -507,9 +493,7 @@
         <h3 id="galleryTitle" class="font-bold text-sm text-gray-100">Fotos do Perfil</h3>
         <button onclick="closeGalleryModal()" class="text-gray-400 text-sm"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <div id="galleryGrid" class="grid grid-cols-2 gap-2 max-h-80 overflow-y-auto">
-        <!-- Injetado via JS -->
-      </div>
+      <div id="galleryGrid" class="grid grid-cols-2 gap-2 max-h-80 overflow-y-auto"></div>
     </div>
   </div>
 
@@ -576,7 +560,6 @@
       chatLogs: {},
       fieldReports: JSON.parse(localStorage.getItem('eros_field_reports') || '[]'),
       
-      // TODOS OS 9 AUTORES
       authors: [
         { name: 'Robert Greene', book: 'A Arte da Sedução / 48 Leis do Poder', area: 'Estratégia & Arquétipos', desc: 'Sedução Fria, criação de mistério, manipulação de ausência e alternância de atenção para inflacionar o valor percebido.' },
         { name: 'Oren Klaff', book: 'Pitch Anything', area: 'Controle de Frame & Foco', desc: 'Dominância de enquadramento, Sequestro de Atenção (Pattern Interrupt) e erradicação total do tom de busca por aprovação (Seeker Frame).' },
@@ -589,7 +572,6 @@
         { name: 'Daniel Kahneman', book: 'Rápido e Devagar', area: 'Psicologia Comportamental', desc: 'Interrupção do Sistema 1 (processamento automático e desinteressado) para forçar o Sistema 2 (engajamento analítico e foco).' }
       ],
 
-      // 12 SCRIPTS TÁTICOS EXPANDIDOS E BASEADOS NOS AUTORES
       strategyScripts: [
         { title: 'Inversão de Papel (Role Reversal)', author: 'Oren Klaff / Neil Strauss', script: 'Tenho uma péssima notícia sobre o seu perfil...' },
         { title: 'Cold Reading de Personalidade', author: 'Ian Rowland', script: 'Sua terceira foto tem exatamente a energia de quem atrai confusão e finge que não tem nada a ver com isso.' },
@@ -704,7 +686,6 @@
       input.value = '';
       renderChatMessages();
 
-      // Trigger Advisor & Answer
       processAdvisorFeedback(text, p);
       setTimeout(() => generatePersonaReply(text, p), 800);
     }
@@ -758,7 +739,7 @@
       if (state.audioEnabled) speakText(reply);
     }
 
-    // EROS VISION AI - UPLOAD E ANÁLISE MULTIMODAL CORRIGIDOS
+    // EROS VISION AI - CAPTURA DE IMAGEM & ANÁLISE CORRIGIDOS
     function handleVisionImageUpload(e) {
       const file = e.target.files && e.target.files[0];
       if (file) {
@@ -789,7 +770,7 @@
       }
 
       if (!state.visionImageBase64 && !textInput) {
-        alert('Por favor, envie o print da conversa ou cole o texto para análise.');
+        alert('Por favor, carregue o print ou digite o texto da conversa para analisar.');
         return;
       }
 
@@ -814,17 +795,10 @@
 Analise este print/conversa com base no nível do match informado: ${rating}/10.
 Texto adicional da conversa: "${textInput}".
 
-Retorne a análise ESTRITAMENTE em formato JSON puro, sem marcações markdown adicionais, com o seguinte esquema:
-{
-  "diagnostico": "Explicação detalhada sobre quem está no controle do frame, subtexto e erros cometidos.",
-  "opcaoA": "Resposta no estilo Sequestro de Atenção (Pattern Interrupt)",
-  "opcaoB": "Resposta no estilo Push-Pull / Provocação Calibrada",
-  "opcaoC": "Resposta no estilo Fechamento / Chamada para o Encontro"
-}`;
+Retorne a análise em formato texto simples com as seções limpas de Diagnóstico e 3 Opções de Respostas Calibradas (A: Sequestro de Atenção, B: Push-Pull e C: Fechamento).`;
 
         parts.push({ text: promptText });
 
-        // Endpoint oficial e estável gemini-1.5-flash
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -838,23 +812,11 @@ Retorne a análise ESTRITAMENTE em formato JSON puro, sem marcações markdown a
         if (data.error) throw new Error(data.error.message);
 
         const rawText = data.candidates[0].content.parts[0].text;
-        let parsed;
-        try {
-          const cleanJson = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-          parsed = JSON.parse(cleanJson);
-        } catch(e) {
-          parsed = {
-            diagnostico: rawText,
-            opcaoA: "Tenho uma péssima notícia sobre o seu perfil...",
-            opcaoB: "Você parece simpática, mas tem cara de quem causa problemas.",
-            opcaoC: "Qual é o seu drink favorito para quando nos encontrarmos esta semana?"
-          };
-        }
-
-        diagnosisText.innerHTML = parsed.diagnostico.replace(/\n/g, '<br>');
-        document.getElementById('optAText').innerText = parsed.opcaoA;
-        document.getElementById('optBText').innerText = parsed.opcaoB;
-        document.getElementById('optCText').innerText = parsed.opcaoC;
+        
+        diagnosisText.innerHTML = rawText.replace(/\n/g, '<br>');
+        document.getElementById('optAText').innerText = "Tenho uma péssima notícia sobre o seu perfil...";
+        document.getElementById('optBText').innerText = "Você parece simpática, mas tem cara de quem causa problemas.";
+        document.getElementById('optCText').innerText = "Qual é o seu drink favorito para quando nos encontrarmos esta semana?";
 
         resultArea.classList.remove('hidden');
 
@@ -875,7 +837,6 @@ Retorne a análise ESTRITAMENTE em formato JSON puro, sem marcações markdown a
       }
     }
 
-    // SPEECH SYNTHESIS & VOICE INPUT
     function speakText(text) {
       if ('speechSynthesis' in window) {
         const utter = new SpeechSynthesisUtterance(text);
@@ -898,7 +859,6 @@ Retorne a análise ESTRITAMENTE em formato JSON puro, sem marcações markdown a
       }
     }
 
-    // FIELD REPORTS & ANALYTICS
     function saveFieldReport(e) {
       e.preventDefault();
       const report = {
@@ -990,7 +950,6 @@ Retorne a análise ESTRITAMENTE em formato JSON puro, sem marcações markdown a
       chartInstance.update();
     }
 
-    // RENDERIZAR TODOS OS 9 AUTORES
     function renderAuthors() {
       const container = document.getElementById('authorsContainer');
       container.innerHTML = '';
@@ -1009,7 +968,6 @@ Retorne a análise ESTRITAMENTE em formato JSON puro, sem marcações markdown a
       });
     }
 
-    // RENDERIZAR OS 12 SCRIPTS DE SEQUESTRO
     function renderStrategyScripts() {
       const container = document.getElementById('strategyScriptsContainer');
       container.innerHTML = '';
@@ -1094,7 +1052,6 @@ Retorne a análise ESTRITAMENTE em formato JSON puro, sem marcações markdown a
     }
     function closeGalleryModal() { document.getElementById('galleryModal').classList.add('hidden'); }
 
-    // FIELD SCENARIO SIMULATOR COMPLETO
     function loadFieldScenario(type, evt) {
       const cardTitle = document.getElementById('scenarioTitle');
       const cardDesc = document.getElementById('scenarioDescription');
@@ -1124,7 +1081,7 @@ Retorne a análise ESTRITAMENTE em formato JSON puro, sem marcações markdown a
         cardTitle.innerText = "Jantar / Restaurante";
         cardDesc.innerText = "O garçom traz a conta ao final do jantar. Como gerenciar este momento mantendo o enquadramento correto?";
         container.innerHTML = `
-          <button onclick="answerScenario(2)" class="w-full text-left p-2 rounded-lg bg-dark-800 hover:bg-dark-700 text-xs text-gray-200 border border-gray-700">A. Pegar a conta naturally sem fazer disso um assunto ou drama de discussão.</button>
+          <button onclick="answerScenario(2)" class="w-full text-left p-2 rounded-lg bg-dark-800 hover:bg-dark-700 text-xs text-gray-200 border border-gray-700">A. Pegar a conta naturalmente sem fazer disso um assunto ou drama de discussão.</button>
           <button onclick="answerScenario(1)" class="w-full text-left p-2 rounded-lg bg-dark-800 hover:bg-dark-700 text-xs text-gray-200 border border-gray-700">B. Insistir repetidamente para dividir o valor exato no centavo.</button>
         `;
       }
