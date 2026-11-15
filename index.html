@@ -799,29 +799,42 @@ Retorne um diagnóstico objetivo de enquadramento (quem tem o controle do frame)
 
     parts.push({ text: promptText });
 
-    const endpoint = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // Modelos atuais ativos para chaves criadas em 2026
+    const modelsToTry = [
+      'gemini-2.5-flash',
+      'gemini-2.0-flash',
+      'gemini-2.5-pro'
+    ];
 
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: parts }] })
-    });
+    let rawText = null;
+    let lastError = null;
 
-    const data = await response.json();
+    for (const modelName of modelsToTry) {
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: parts }] })
+      });
 
-    if (data.error) {
-      throw new Error(data.error.message);
+      const data = await response.json();
+
+      if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
+        rawText = data.candidates[0].content.parts[0].text;
+        break;
+      } else if (data.error) {
+        lastError = data.error.message;
+      }
     }
 
-    if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
-      const rawText = data.candidates[0].content.parts[0].text;
+    if (rawText) {
       diagnosisText.innerHTML = rawText.replace(/\n/g, '<br>');
       document.getElementById('optAText').innerText = "Tenho uma péssima notícia sobre o seu perfil...";
       document.getElementById('optBText').innerText = "Você parece simpática, mas tem cara de quem causa problemas.";
       document.getElementById('optCText').innerText = "Qual é o seu drink favorito para quando nos encontrarmos esta semana?";
       resultArea.classList.remove('hidden');
     } else {
-      alert('Nenhuma resposta retornada pela API.');
+      throw new Error(lastError || 'Nenhum modelo compatível respondeu.');
     }
 
   } catch (err) {
