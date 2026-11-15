@@ -17,8 +17,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="icon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
 
-  <!-- Registo do Service Worker para suporte Offline -->
- <!-- Desativação Forçada do Service Worker e Cache -->
+  <!-- Desativação Forçada do Service Worker e Cache Antigo -->
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then(registrations => {
@@ -192,7 +191,7 @@
         <p class="text-xs text-gray-300">Carregue um print da conversa do Tinder, Instagram ou WhatsApp para obter uma análise fria do enquadramento e sugestões de resposta calibradas.</p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Area de Upload Clicável em Telas Mobile -->
+          <!-- Area de Upload Clicável -->
           <div class="border-2 border-dashed border-gray-700 hover:border-gold-500/50 rounded-xl p-6 flex flex-col items-center justify-center text-center bg-dark-900/50 relative cursor-pointer min-h-[160px]">
             <input type="file" id="visionFileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" onchange="handleVisionImageUpload(event)">
             <i class="fa-solid fa-cloud-arrow-up text-3xl text-gold-400 mb-2 pointer-events-none"></i>
@@ -420,7 +419,6 @@
 
       <div class="glass-card rounded-2xl p-4 border border-gold-500/20 space-y-4">
         <p class="text-xs text-gray-300">Gatilhos mentais fundamentados nos autores para romper o processamento automático da mulher e prender a atenção no primeiro segundo.</p>
-
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="strategyScriptsContainer"></div>
       </div>
     </section>
@@ -701,50 +699,96 @@
       document.getElementById('attractionBar').style.width = `${state.attraction}%`;
     }
 
-    async function generatePersonaReply(userText, p) {
-  const apiKey = (localStorage.getItem('eros_gemini_key') || state.geminiApiKey || '').trim();
+    // MOTOR AUXILIAR GEMINI COM AUTO-DESCOBERTA DE MODELOS
+    async function getWorkingGeminiResponse(apiKey, parts) {
+      const priorityModels = [
+        'gemini-3.1-pro-preview',
+        'gemini-3.1-flash-preview',
+        'gemini-3.0-flash',
+        'gemini-2.5-flash'
+      ];
 
-  if (apiKey) {
-    const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+      let lastError = '';
 
-    for (const modelName of modelsToTry) {
+      for (const modelName of priorityModels) {
+        try {
+          const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: parts }] })
+          });
+          const data = await response.json();
+
+          if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+            return data.candidates[0].content.parts[0].text;
+          } else if (data.error) {
+            lastError = data.error.message;
+          }
+        } catch (e) {
+          lastError = e.message;
+        }
+      }
+
       try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: `Você é a persona de Tinder ${p.name}, nota de beleza percebida ${p.rating}/10, arquétipo "${p.archetype}". Instruções: ${p.prompt}. Responda à seguinte mensagem do homem mantendo a personalidade de forma curta (máximo 2 frases): "${userText}"`
-              }]
-            }]
-          })
-        });
+        const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+        const listData = await listRes.json();
+        
+        if (listData.models) {
+          const validModel = listData.models.find(m => 
+            m.supportedGenerationMethods?.includes('generateContent') && 
+            m.name.includes('gemini') &&
+            !m.name.includes('vision') &&
+            !m.name.includes('1.0')
+          );
 
-        const data = await response.json();
-        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
-          const reply = data.candidates[0].content.parts[0].text;
+          if (validModel) {
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/${validModel.name}:generateContent?key=${apiKey}`;
+            const response = await fetch(endpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ contents: [{ parts: parts }] })
+            });
+            const data = await response.json();
+            if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+              return data.candidates[0].content.parts[0].text;
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Falha na auto-descoberta:', e);
+      }
+
+      throw new Error(lastError || 'Nenhum modelo compatível encontrado nesta chave.');
+    }
+
+    // SIMULADOR DE CHAT
+    async function generatePersonaReply(userText, p) {
+      const apiKey = (localStorage.getItem('eros_gemini_key') || state.geminiApiKey || '').trim();
+
+      if (apiKey) {
+        try {
+          const prompt = `Você é a persona de Tinder ${p.name}, nota de beleza percebida ${p.rating}/10, arquétipo "${p.archetype}". Instruções: ${p.prompt}. Responda à seguinte mensagem do homem mantendo a personalidade de forma curta (máximo 2 frases): "${userText}"`;
+          const reply = await getWorkingGeminiResponse(apiKey, [{ text: prompt }]);
+          
           state.chatLogs[p.name].push({ sender: 'persona', text: reply });
           renderChatMessages();
           if (state.audioEnabled) speakText(reply);
           return;
+        } catch (e) {
+          console.error("Erro na API do Chat, recorrendo ao modo local:", e);
         }
-      } catch (e) {
-        console.error(`Erro no modelo ${modelName}:`, e);
       }
+
+      let reply = "Interessante... mas você sempre é tão direto assim?";
+      if (parseFloat(p.rating) >= 9.5) reply = "Gostei da audácia, mas ainda não me convenceu.";
+      
+      state.chatLogs[p.name].push({ sender: 'persona', text: reply });
+      renderChatMessages();
+      if (state.audioEnabled) speakText(reply);
     }
-  }
 
-  // Fallback para Modo Local caso a API não responda ou não haja chave salva
-  let reply = "Interessante... mas você sempre é tão direto assim?";
-  if (parseFloat(p.rating) >= 9.5) reply = "Gostei da audácia, mas ainda não me convenceu.";
-  
-  state.chatLogs[p.name].push({ sender: 'persona', text: reply });
-  renderChatMessages();
-  if (state.audioEnabled) speakText(reply);
-}
-
-    // EROS VISION AI - CAPTURA DE IMAGEM & ANÁLISE COM FALLBACK MULTI-MODELO
+    // EROS VISION AI
     function handleVisionImageUpload(e) {
       const file = e.target.files && e.target.files[0];
       if (file) {
@@ -761,42 +805,42 @@
       }
     }
 
-  async function analyzeVisionPrint() {
-  const apiKey = (localStorage.getItem('eros_gemini_key') || state.geminiApiKey || '').trim();
-  const rating = document.getElementById('visionRating').value;
-  const textInput = document.getElementById('visionTextInput').value.trim();
-  const btn = document.getElementById('btnAnalisarVision');
-  const resultArea = document.getElementById('visionResult');
-  const diagnosisText = document.getElementById('visionDiagnosisText');
+    async function analyzeVisionPrint() {
+      const apiKey = (localStorage.getItem('eros_gemini_key') || state.geminiApiKey || '').trim();
+      const rating = document.getElementById('visionRating').value;
+      const textInput = document.getElementById('visionTextInput').value.trim();
+      const btn = document.getElementById('btnAnalisarVision');
+      const resultArea = document.getElementById('visionResult');
+      const diagnosisText = document.getElementById('visionDiagnosisText');
 
-  if (!apiKey) {
-    alert('Por favor, insira a sua chave da Gemini API no topo (ícone da chave amarela)!');
-    return;
-  }
+      if (!apiKey) {
+        alert('Por favor, insira a sua chave da Gemini API no topo (ícone da chave amarela)!');
+        return;
+      }
 
-  if (!state.visionImageBase64 && !textInput) {
-    alert('Por favor, carregue o print ou digite o texto da conversa para analisar.');
-    return;
-  }
+      if (!state.visionImageBase64 && !textInput) {
+        alert('Por favor, carregue o print ou digite o texto da conversa para analisar.');
+        return;
+      }
 
-  btn.innerText = '🔄 Processando Análise de Frame...';
-  btn.disabled = true;
+      btn.innerText = '🔄 Processando Análise de Frame...';
+      btn.disabled = true;
 
-  try {
-    const parts = [];
+      try {
+        const parts = [];
 
-    if (state.visionImageBase64) {
-      const base64Data = state.visionImageBase64.split(',')[1];
-      const mimeType = state.visionImageBase64.split(';')[0].split(':')[1] || 'image/png';
-      parts.push({
-        inline_data: {
-          mime_type: mimeType,
-          data: base64Data
+        if (state.visionImageBase64) {
+          const base64Data = state.visionImageBase64.split(',')[1];
+          const mimeType = state.visionImageBase64.split(';')[0].split(':')[1] || 'image/png';
+          parts.push({
+            inline_data: {
+              mime_type: mimeType,
+              data: base64Data
+            }
+          });
         }
-      });
-    }
 
-    const promptText = `Atue como o motor EROS VISION, especialista em dinâmica de atração, sedução e psicologia de enquadramento.
+        const promptText = `Atue como o motor EROS VISION, especialista em dinâmica de atração, sedução e psicologia de enquadramento.
 Analise este print/conversa com base no nível do match informado: ${rating}/10.
 Texto adicional da conversa: "${textInput}".
 
@@ -805,54 +849,25 @@ Retorne um diagnóstico objetivo de enquadramento (quem tem o controle do frame)
 - Opção B (Push-Pull / Provocação Calibrada)
 - Opção C (Fechamento / Chamada para o Encontro).`;
 
-    parts.push({ text: promptText });
+        parts.push({ text: promptText });
 
-    // Modelos atuais ativos para chaves criadas em 2026
-    const modelsToTry = [
-      'gemini-2.5-flash',
-      'gemini-2.0-flash',
-      'gemini-2.5-pro'
-    ];
+        const rawText = await getWorkingGeminiResponse(apiKey, parts);
 
-    let rawText = null;
-    let lastError = null;
+        diagnosisText.innerHTML = rawText.replace(/\n/g, '<br>');
+        document.getElementById('optAText').innerText = "Tenho uma péssima notícia sobre o seu perfil...";
+        document.getElementById('optBText').innerText = "Você parece simpática, mas tem cara de quem causa problemas.";
+        document.getElementById('optCText').innerText = "Qual é o seu drink favorito para quando nos encontrarmos esta semana?";
+        resultArea.classList.remove('hidden');
 
-    for (const modelName of modelsToTry) {
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: parts }] })
-      });
-
-      const data = await response.json();
-
-      if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
-        rawText = data.candidates[0].content.parts[0].text;
-        break;
-      } else if (data.error) {
-        lastError = data.error.message;
+      } catch (err) {
+        alert('Erro de comunicação API: ' + err.message);
+        console.error(err);
+      } finally {
+        btn.innerText = '⚡ Analisar Print e Gerar Respostas';
+        btn.disabled = false;
       }
     }
 
-    if (rawText) {
-      diagnosisText.innerHTML = rawText.replace(/\n/g, '<br>');
-      document.getElementById('optAText').innerText = "Tenho uma péssima notícia sobre o seu perfil...";
-      document.getElementById('optBText').innerText = "Você parece simpática, mas tem cara de quem causa problemas.";
-      document.getElementById('optCText').innerText = "Qual é o seu drink favorito para quando nos encontrarmos esta semana?";
-      resultArea.classList.remove('hidden');
-    } else {
-      throw new Error(lastError || 'Nenhum modelo compatível respondeu.');
-    }
-
-  } catch (err) {
-    alert('Erro de comunicação API: ' + err.message);
-    console.error(err);
-  } finally {
-    btn.innerText = '⚡ Analisar Print e Gerar Respostas';
-    btn.disabled = false;
-  }
-}
     function copyText(elementId) {
       const txt = document.getElementById(elementId).innerText;
       if (txt && txt !== '---') {
